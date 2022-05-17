@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="uuid-6c23671a-17ea-432f-87ea-2456c1ed1d77" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="61.794" height="61.794" viewBox="0 0 61.794 61.794">
+  <rect x="3.5" y="3.5" width="54.794" height="54.794" rx="12.238" ry="12.238" fill="none" stroke="#444" stroke-miterlimit="10" stroke-width="7"/>
+  <line x1="30.897" y1="10.897" x2="30.897" y2="50.897" fill="none" stroke="#444" stroke-miterlimit="10" stroke-width="7"/>
+  <line x1="10.897" y1="30.897" x2="50.897" y2="30.897" fill="none" stroke="#444" stroke-miterlimit="10" stroke-width="7"/>
+</svg>
