@@ -6,7 +6,7 @@ import { authAtom, usersAtom } from '../_state';
 export { useUserActions };
 
 function useUserActions () {
-    const baseUrl = `${process.env.REACT_APP_API_URL}/users`;
+    const baseUrl = `http://34.85.215.122`;
     const fetchWrapper = useFetchWrapper();
     const setAuth = useSetRecoilState(authAtom);
     const setUsers = useSetRecoilState(usersAtom);
@@ -18,7 +18,7 @@ function useUserActions () {
     }
 
     function login(username, password) {
-        return fetchWrapper.post(`${baseUrl}/authenticate`, { username, password })
+        return fetchWrapper.post(`${baseUrl}/login`, { username, password })
             .then(user => {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));

@@ -13,12 +13,12 @@ function Home() {
   const users = useRecoilValue(usersAtom);
   const userActions = useUserActions();
   const fetchWrapper = useFetchWrapper();
-  const items = fetchWrapper.get("api.instaswatch.com/feed/");
+  const items = fetchWrapper.get("http://34.85.215.122/feed");
 
   useEffect(() => {
       userActions.getAll();
   }, []);
-
+  console.log(items)
     return (
       <div className="feed">
         {items.map(item => postFeed(item))}

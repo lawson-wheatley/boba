@@ -44,7 +44,7 @@ def upload():
     if f and allowed_file(f.filename):
         val = os.path.splitext(f.name)
         full_final_name = str(uuid.uuid4()) + val[1]
-        post_location = F"/storage/{full_final_name}"
+        post_location = f"/storage/{full_final_name}"
         f.save(post_location)
         post.flocation = post_location
     comments = Comments()
@@ -95,7 +95,7 @@ def refresh_expiring_jwt(response):
 def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
-    following = User.query(User.id == current_user).first().following;
+    following = User.query.filter(User.id == current_user).first().following;
     posts = Post.query.filter(Post.poster.in_(following)).paginate(0, 25, False);
     return jsonify(posts), 200;
 
@@ -118,7 +118,10 @@ def create_token():
     return create_token(email, password)
 
 def create_token(email, password):
-    user = User.query.filter_by(email=email).first()
+    print(email)
+    print(password)
+    user = User.query.filter(User.email==email).first()
+    print(user)
     if checkPass(password, user.salt) != user.password:
         return {"msg":"incorrect email or password"}, 401
     access_token = create_access_token(identity = user.id)
@@ -223,4 +226,4 @@ def checkPass(password : str, salt: str) -> str:
 
 
 if __name__ == "__main__":
-    api.run(debug=True, port=80)
+    api.run(debug=True, host="0.0.0.0", port=80)

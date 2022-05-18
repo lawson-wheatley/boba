@@ -15,7 +15,7 @@ function Login({ setToken }) {
 
   // form validation rules 
   const validationSchema = Yup.object().shape({
-      username: Yup.string().required('Username is required'),
+      email: Yup.string().required('Email is required'),
       password: Yup.string().required('Password is required')
   });
   const formOptions = { resolver: yupResolver(validationSchema) };
@@ -24,23 +24,27 @@ function Login({ setToken }) {
   const { register, handleSubmit, setError, formState } = useForm(formOptions);
   const { errors, isSubmitting } = formState;
 
-  function onSubmit({ username, password }) {
-      return userActions.login(username, password)
+  function onSubmit({ email, password }) {
+      return userActions.login(email, password)
           .catch(error => {
               setError('apiError', { message: error });
           });
   }
     return (
-      <div className="container">
+        <div className="login-containerv">
+            <div className = "login-containerh">
+      <div className="container-bubble">
             <div className="loginform lf" onSubmit={handleSubmit(onSubmit)}>
                 <img className= "logologin" src="/img/logo.svg"></img>
                 <form className="lf" >
-                    <input className="in cl si" type="email" name="email" placeholder="Email" {...register('username')}></input>
+                    <input className="in cl si" type="email" name="email" placeholder="Email" {...register('email')}></input>
                     <input className="in cl si" type="password" name="password" placeholder="Password" {...register('password')}></input>
                     <input className="bt in" type="submit"></input>
                 </form>
                 <span className="fp" > Forgot password? </span>
             </div>
+        </div>
+        </div>
         </div>
     );
   }
