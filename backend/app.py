@@ -114,7 +114,7 @@ def follow():
 @api.route("/login", methods = ["POST","GET"])
 def create_token():
     print(request.json)
-    email = request.json.get("email", None)
+    email = request.json.get("username", None)
     password = request.json.get("password", None)
     return create_token(email, password)
 
