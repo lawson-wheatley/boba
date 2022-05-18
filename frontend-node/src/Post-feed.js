@@ -1,15 +1,17 @@
 import React from "react";
 import logo from './logo.svg';
+import Comment from './Comment';
+import { useFetchWrapper } from "./_helpers";
+
+
 
 function postFeed(item) {
   const fetchWrapper = useFetchWrapper();
-  const comments = fetch("api.instaswatch.com/post-comments/"+item.url, {"num":"5"})
+  const comments = fetchWrapper("api.instaswatch.com/comments/"+item.url, {"num":"5"});
     return (
       <div className="post">
         <div className="image">
-            <img src={item.location}>
-
-            </img>
+            <img src={item.location}></img>
         </div>
         <div className="bottom">
             <div className = "username">
@@ -22,7 +24,7 @@ function postFeed(item) {
               {item.likes}
             </div>
             <div className ="comments">
-              {comments.map(cm => comment(cm))}
+              {comments.map(cm => Comment(cm))}
             </div>
         </div>
       </div>

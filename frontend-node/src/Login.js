@@ -1,13 +1,15 @@
 import React from "react";
 import logo from './logo.svg';
-import { authAtom } from '../_state';
-import { useUserActions } from '../_actions';
+import { authAtom } from './_state';
+import { useUserActions } from './_actions';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useRecoilValue } from 'recoil';
+import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import * as Yup from 'yup';
 
 
 function Login({ setToken }) {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-
   const auth = useRecoilValue(authAtom);
   const userActions = useUserActions();
 
@@ -49,7 +51,4 @@ function Login({ setToken }) {
         </div>
     );
   }
-Login.propTypes = {
-    setToken: PropTypes.func.isRequired
-  }  
 export default Login;

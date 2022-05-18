@@ -1,8 +1,10 @@
 import React from "react";
 import logo from './logo.svg';
+import { useFetchWrapper } from "./_helpers";
 
 function Profile() {
-  const item = fetchWrapper.get("api.instaswatch.com/post/"+);
+  const fetchWrapper = useFetchWrapper();
+  const item = fetchWrapper.get("api.instaswatch.com/post/");
     return (
         <div class="center">
             <div class="pad">
@@ -16,7 +18,7 @@ function Profile() {
                 <div id = "profile-bio"></div>
                 {item.bio}
                 <div id = "profile-followers"></div>
-                <a href = {item.username + "/followers"}></a>
+                <a href = {"/profile/" + item.username + "/followers"}></a>
                 <div id = "profile-following"></div>
                 <a href = {item.username + "/following"}></a>
             </div>
