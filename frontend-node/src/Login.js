@@ -13,13 +13,6 @@ function Login({ setToken }) {
   const auth = useRecoilValue(authAtom);
   const userActions = useUserActions();
 
-  useEffect(() => {
-      // redirect to home if already logged in
-      if (auth) history.push('/');
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // form validation rules 
   const validationSchema = Yup.object().shape({
       username: Yup.string().required('Username is required'),
@@ -42,8 +35,8 @@ function Login({ setToken }) {
             <div className="loginform lf" onSubmit={handleSubmit(onSubmit)}>
                 <img className= "logologin" src="/img/logo.svg"></img>
                 <form className="lf" >
-                    <input className="in cl si" type="email" name="email" placeholder="Email" {...register('username')} className={`form-control ${errors.username ? 'is-invalid' : ''}`}></input>
-                    <input className="in cl si" type="password" name="password" placeholder="Password" {...register('password')} className={`form-control ${errors.password ? 'is-invalid' : ''}`}></input>
+                    <input className="in cl si" type="email" name="email" placeholder="Email" {...register('username')}></input>
+                    <input className="in cl si" type="password" name="password" placeholder="Password" {...register('password')}></input>
                     <input className="bt in" type="submit"></input>
                 </form>
                 <span className="fp" > Forgot password? </span>

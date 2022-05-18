@@ -6,6 +6,7 @@ import Home from './Home';
 import Login from './Login';
 import Upload from './Upload';
 import Followers from './Followers';
+import { RecoilRoot } from "recoil";
 import Following from './Following';
 import { BrowserRouter, useState, Routes, Route } from "react-router-dom";
 //import Upload from './Upload'
@@ -13,6 +14,7 @@ import { BrowserRouter, useState, Routes, Route } from "react-router-dom";
 import Profile from './Profile'
 function App() {
   return (
+  <RecoilRoot>
   <BrowserRouter>
     <Routes>
     <Route path="/login" element={<Login />} />
@@ -24,6 +26,7 @@ function App() {
     <Route path="/post/:id" element={<Post />} />
     <Route path="/upload" element={<Upload />} />
     </Routes>
-  </BrowserRouter>)
+  </BrowserRouter>
+  </RecoilRoot>)
 }
 export default App;

@@ -29,19 +29,49 @@ def allowed_file(filename):
 @api.route("/upload", methods=["POST"])
 @jwt_required()
 def upload():
-   if request.method == "POST":
-        if 'file' not in request.files:
-           return jsonify({"message" : "No file in request"}), 400
-        f = request.files['file']
-        if f.filename == '':
-           return jsonify({"message" : "No file selected for uploading"}), 400
-        elif f and allowed_file(f.filename):
-            val = os.path.splitext(f.name)
-            full_final_name = str(uuid.uuid4()) + val[1]
-            f.save(f"/storage/{full_final_name}")
-            return jsonify({"message" : "FIle successfully uploaded", "path" : full_final_name})
-        return jsonify({"mesage": "Unknown Error"}), 400
-            
+    user = get_jwt_identity()
+    posttext = request.json.get("text", None)
+    title = request.json.get("title", None)
+    post = Post()
+    post.poster = user;
+    post.posttitle = title;
+    post.content = posttext;
+    if 'file' not in request.files:
+        return jsonify({"message" : "Posted!"}), 200
+    f = request.files['file']
+    if f.filename == '':
+        return jsonify({"message" : "No file selected for uploading"}), 400
+    if f and allowed_file(f.filename):
+        val = os.path.splitext(f.name)
+        full_final_name = str(uuid.uuid4()) + val[1]
+        f.save(f"/storage/{full_final_name}")
+        post.flocation = f"/storage/{full_final_name}"
+    comments = Comments()
+    comments.post_id = post.id
+    comments.post = post
+    likes = Likes()
+    likes.post_id = post.id
+    likes.post = post
+    db.session.add([post, comments, likes])
+    db.session.commit()
+
+    return jsonify({"message": "Unknown Error"}), 400
+
+@api.route("/comment", methods=["POST"])
+@jwt_required()
+def upload():
+    user = get_jwt_identity()
+    comment = request.json.get("comment", None)
+    post = request.json.get("post", None)
+    comments = Comments.query.filter(Comments.post_id == post).first()
+    com = Comment()
+    com.owner_id = user
+    com.text = comment
+    com.comments_id = comments.id
+    com.comments = comments
+    comments.coms.insert(com)
+    db.session.commit()
+
 @api.after_request
 def refresh_expiring_jwt(response):
     try:
@@ -64,7 +94,9 @@ def refresh_expiring_jwt(response):
 def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
-    Post.query(poster )
+    following = User.query(User.id == current_user).first().following;
+    posts = Post.query.filter(Post.poster.in_(following)).paginate(0, 25, False);
+    return jsonify(posts), 200;
 
 @api.route("/follow", methods=["POST"])
 @jwt_required()
@@ -190,4 +222,4 @@ def checkPass(password : str, salt: str) -> str:
 
 
 if __name__ == "__main__":
-    api.run(debug=True)
+    api.run(debug=True, port=80)
