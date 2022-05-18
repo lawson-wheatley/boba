@@ -25,6 +25,8 @@ This project was written with Python 3.8, latest packages.
 
 These can each be installed via pip.
 
+This project also runs with Node.JS, React.JS, Recoil, and Yarn. Install the latest versions of those.
+
 ## How to Use
 This website is fairly easy to use, with many design cues taken from other social media websites
 
