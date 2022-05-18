@@ -4,6 +4,7 @@ import Notifications from './Notifications';
 import Post from './Post';
 import Home from './Home';
 import Login from './Login';
+import Upload from './Upload';
 import Followers from './Followers';
 import Following from './Following';
 import { BrowserRouter, useState, Routes, Route } from "react-router-dom";

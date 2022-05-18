@@ -19,7 +19,7 @@ function vs(){
             <a class = "aa" href = "/search">
                 <img class="mob-navimg" src="/img/search.svg"/>
             </a>
-            <a class = "aa" href = "/post">
+            <a class = "aa" href = "/upload">
                 <img class="mob-navimg" src="/img/post.svg">
             </a>
             <a class = "aa" href = "/notifications">
@@ -50,13 +50,13 @@ function vs(){
             <a class = "aa" href = "/search">
                 <img class="mob-navimg" src="/img/search.svg"/>
             </a>
-            <a class = "aa" href = "/post">
+            <a class = "aa" href = "/upload">
                 <img class="mob-navimg" src="/img/post.svg">
             </a>
             <a class = "aa" href = "/notifications">
                 <img class="mob-navimg" src="/img/notification.svg"/>
             </a>
-            <a class = "aa" href = "/profile">
+            <a class = "aa" href = "/upload">
                 <img class="mob-navimg" src="/img/profile.svg"/>
             </a>
         </ul>
@@ -82,7 +82,7 @@ else{
         <div class = "realnav">
             <ul class="navul">
                 <li class="">
-                    <a class = "aa" href = "/post">
+                    <a class = "aa" href = "/upload">
                         <img class="navimg" src="/img/post.svg"></img>
                     </a>
                 </li>
@@ -97,7 +97,7 @@ else{
                     </a>
                 </li>
                 <li class="nlipl25">
-                    <a class = "aa" href = "/profile">
+                    <a class = "aa" href = "/upload">
                         <img class="navimg" src="/img/profile.svg"></img>
                     </a>
                 </li>

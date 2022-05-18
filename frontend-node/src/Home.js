@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import logo from './logo.svg';
 import postFeed from './Post-feed'
 import { useRecoilValue } from 'recoil'
