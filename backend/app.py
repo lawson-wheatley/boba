@@ -113,13 +113,12 @@ def follow():
 
 @api.route("/login", methods = ["POST","GET"])
 def create_token():
+    print(request.json)
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     return create_token(email, password)
 
 def create_token(email, password):
-    print(email)
-    print(password)
     user = User.query.filter(User.email==email).first()
     print(user)
     if checkPass(password, user.salt) != user.password:
