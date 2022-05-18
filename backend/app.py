@@ -44,8 +44,9 @@ def upload():
     if f and allowed_file(f.filename):
         val = os.path.splitext(f.name)
         full_final_name = str(uuid.uuid4()) + val[1]
-        f.save(f"/storage/{full_final_name}")
-        post.flocation = f"/storage/{full_final_name}"
+        post_location = F"/storage/{full_final_name}"
+        f.save(post_location)
+        post.flocation = post_location
     comments = Comments()
     comments.post_id = post.id
     comments.post = post
@@ -59,7 +60,7 @@ def upload():
 
 @api.route("/comment", methods=["POST"])
 @jwt_required()
-def upload():
+def comment():
     user = get_jwt_identity()
     comment = request.json.get("comment", None)
     post = request.json.get("post", None)
