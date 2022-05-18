@@ -3,8 +3,6 @@ import logo from './logo.svg';
 import Comment from './Comment';
 import { useFetchWrapper } from "./_helpers";
 
-
-
 function postFeed(item) {
   const fetchWrapper = useFetchWrapper();
   const comments = fetchWrapper("api.instaswatch.com/comments/"+item.url, {"num":"5"});

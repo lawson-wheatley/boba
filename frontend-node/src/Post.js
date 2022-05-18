@@ -6,6 +6,7 @@ import Comment from './Comment';
 function Post() {
   const fetchWrapper = useFetchWrapper();
   const item = fetchWrapper.get("api.instaswatch.com/post/");
+  const comments = fetchWrapper.get("api.instaswatch.com/comments/");
     return (
       <div className="post">
           <div className="image">

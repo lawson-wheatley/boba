@@ -16,4 +16,4 @@ function Following() {
     );
   }
   
-export default Followers;
+export default Following;
