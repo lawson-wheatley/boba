@@ -93,7 +93,6 @@ def refresh_expiring_jwt(response):
 @api.route("/feed", methods = ["GET"])
 @jwt_required()
 def feed():
-    print(request)
     current_user = get_jwt_identity()
     page = request.args.get("page")
     following = User.query.filter(User.id == current_user).first().following;
@@ -125,7 +124,8 @@ def create_token(email, password):
     if checkPass(password, user.salt) != user.password:
         return {"msg":"incorrect email or password"}, 401
     access_token = create_access_token(identity = user.id)
-    return access_token
+    response = jsonify(access_token=access_token)
+    return response
 
 @api.route("/protected", methods=["GET"])
 @jwt_required()
