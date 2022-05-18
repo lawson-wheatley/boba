@@ -25,6 +25,7 @@ function useFetchWrapper() {
                 requestOptions.headers['Content-Type'] = 'application/json';
                 requestOptions.body = JSON.stringify(body);
             }
+            console.log(requestOptions);
             return fetch(url, requestOptions).then(handleResponse);
         }
     }
@@ -33,9 +34,11 @@ function useFetchWrapper() {
     
     function authHeader(url) {
         // return auth header with jwt if user is logged in and request is to the api url
+        console.log("ISAPI:")
         const token = auth?.token;
         const isLoggedIn = !!token;
-        const isApiUrl = url.startsWith(process.env.REACT_APP_API_URL);
+        const isApiUrl = true;
+        console.log(isLoggedIn);
         if (isLoggedIn && isApiUrl) {
             return { Authorization: `Bearer ${token}` };
         } else {

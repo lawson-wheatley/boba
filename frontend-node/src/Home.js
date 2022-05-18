@@ -14,7 +14,7 @@ function Home() {
   const userActions = useUserActions();
   const fetchWrapper = useFetchWrapper();
   const items = fetchWrapper.get("http://34.85.215.122/feed");
-
+  console.log(localStorage);
   useEffect(() => {
       userActions.getAll();
   }, []);

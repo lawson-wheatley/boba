@@ -25,10 +25,10 @@ function Login({ setToken }) {
   const { errors, isSubmitting } = formState;
 
   function onSubmit({ email, password }) {
-      return userActions.login(email, password)
+      console.log(userActions.login(email, password)
           .catch(error => {
               setError('apiError', { message: error });
-          });
+          }));
   }
     return (
         <div className="login-containerv">
