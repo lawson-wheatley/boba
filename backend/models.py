@@ -6,8 +6,11 @@ from sqlalchemy.sql import func
 
 db = SQLAlchemy()
 
+
+
+
 class User(db.Model):
-    __tablename__ = "user"
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key = True)
     
     username = db.Column(db.String(40), unique=True, nullable=False)
@@ -20,52 +23,66 @@ class User(db.Model):
     
     joined = db.Column(db.DateTime(timezone=True), server_default=func.now())
     lastlogin = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    
-    posts = db.relationship('Post', backref = 'userp', lazy = True)
-    comments = db.relationship('Comment', backref = 'userc', lazy = True)
-    likes = db.relationship('Like', backref = 'userl', lazy = True)
+    following = db.relationship(
+        'User', lambda: user_following,
+        primaryjoin=lambda: User.id == user_following.c.user_id,
+        secondaryjoin=lambda: User.id == user_following.c.following_id,
+        backref='followers'
+    )
     
     picture = db.Column(db.String, nullable = True)
-    
-    
-class Followers(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'))
-    followers = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-class Following(db.Model):
+user_following = db.Table(
+    'user_following', db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey(User.id), primary_key=True),
+    db.Column('following_id', db.Integer, db.ForeignKey(User.id), primary_key=True)
+)
+
+class community(db.Model):
+    __tablename__ = "community"
     id = db.Column(db.Integer, primary_key = True)
-    user = db.Column(db.Integer, db.ForeignKey('userfolg.id'))
-    follower = db.Column(db.Integer, db.ForeignKey('user'))
+    name = db.Column(db.String(40), unique=True, nullable=False)
+
     
 class Post(db.Model):
+    __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key = True)
-    poster = db.Column(db.Integer, db.ForeignKey('userp.id'))
-    flocation = db.Column(db.String(120), unique=True, nullable=False)
+    poster = db.Column(db.Integer, db.ForeignKey('users.id'))
+    isText = db.Column(db.Boolean, nullable = False)
+    flocation = db.Column(db.String(120), nullable = True)
+    content = db.Column(db.String(500), nullable = True)
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    comments = db.relationship('Comments', backref = "postc", lazy = True)
-    likes = db.relationship('Likes', backref = "postl", lazy = True)
+    comments = db.relationship('Comments', back_populates="post", uselist=False)
+    likes = db.relationship('Likes', back_populates="post", lazy = True)
     
 class Comments(db.Model):
+    __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key = True)
-    db.Column(db.Integer, db.ForeignKey('postc.id'))
-    comment_indiv = db.relationship('Comment', backref = "comments", lazy = True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    post = db.relationship("Post", back_populates="comments")
+    coms = db.relationship("Comment", back_populates="comments")
 
 class Comment(db.Model):
+    __tablename__ = "comment"
     id = db.Column(db.Integer, primary_key = True)
+    comments_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
+    comments = db.relationship("Comments", back_populates="coms")
     text = db.Column(db.String(140), nullable=False)
-    db.Column(db.Integer, db.ForeignKey('comments.id'))
-    db.Column(db.Integer, db.ForeignKey('userc.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
     
 class Likes(db.Model):
+    __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key = True)
-    db.Column(db.Integer, db.ForeignKey('postl.id'))
-    comment_indiv = db.relationship('Like', backref = "likes", lazy = True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    post = db.relationship("Post", back_populates="likes")
+    likm = db.relationship("Like")
 
 class Like(db.Model):
+    __tablename__ = "like"
     id = db.Column(db.Integer, primary_key = True)
     text = db.Column(db.String(140), nullable=False)
-    db.Column(db.Integer, db.ForeignKey('likes.id'))
-    db.Column(db.Integer, db.ForeignKey('userl.id'))
+    owner = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    likes_id = db.Column(db.Integer, db.ForeignKey('likes.id'))
+    
