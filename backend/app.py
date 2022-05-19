@@ -30,7 +30,7 @@ def allowed_file(filename):
 @jwt_required()
 def upload():
     user = get_jwt_identity()
-    print(request)
+    print(request.json)
     community = request.json.get("community", None)
     posttext = request.json.get("text", None)
     title = request.json.get("title", None)
