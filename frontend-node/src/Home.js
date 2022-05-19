@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from './logo.svg';
-import postFeed from './Post-feed'
+import PostFeed from './Post-feed'
 import { useRecoilValue } from 'recoil'
 import { authAtom, usersAtom } from './_state'
 import { useFetchWrapper } from "./_helpers";
@@ -18,6 +18,9 @@ function Home() {
   const fetchWrapper = useFetchWrapper();
   const [loaded, finishedLoading] = useState(false);
   const [itms, setItems] = useState([])
+  function likeContent(id){
+    fetchWrapper.post("http://127.0.0.1:80/like", {"id":id})
+  }
   if(!loaded){
     fetchWrapper.get("http://127.0.0.1:80/feed").then(result => {
       delete result.access_token;
@@ -31,7 +34,14 @@ function Home() {
   return (
     <div className="centerPos">
     <div className="feed">
-      {itms.map(item => postFeed(item))}
+      {itms.map(item => PostFeed(item, likeContent))}
+    </div>
+    <div className="create">
+    <div className="createpost">
+      <img class="mob-navimg moba" src="/img/logo.svg"/>
+      <a href="/upload" class="abutton">Create a Post</a>
+      <a href="/createcommunity" class="abutton">Create a Community</a>
+      </div>
     </div>
     </div>
   );}

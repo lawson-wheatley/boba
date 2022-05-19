@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from './logo.svg';
 import { useFetchWrapper } from "./_helpers";
 import { useParams } from "react-router-dom";
-import postFeed from "./Post-feed";
+import PostFeed from "./Post-feed";
 
 function Profile() {
   const fetchWrapper = useFetchWrapper();
@@ -90,7 +90,7 @@ function Profile() {
             </div>
             <div className="profile-posts centerPos">
                 <div className="feed">
-                {items.map(item => postFeed(item))}
+                {items.map(item => PostFeed(item))}
                 </div>
             </div>
         </div>

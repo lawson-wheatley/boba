@@ -8,25 +8,33 @@ function Post() {
   const fetchWrapper = useFetchWrapper();
   const { id } = useParams();
   const item = fetchWrapper.get("api.instaswatch.com/post/"+id);
+  var comment = "";
+  function sub() {
+    return fetchWrapper.post("http://127.0.0.1:80/makecomment", {"comment":comment, "id":item.id});
+  }
     return (
-      
       <div className="post">
-         <span className="post-title">{item.title}</span>
-      <div className="post-top"><span className="post-title">{item.title}</span> by <a href={"/profile/"+item.poster}>{item.poster}</a></div>
-      <div className="image post-image">
-          <img className = "post-image" src={"http://127.0.0.1:80"+item.flocation}></img>
+        <div className="post-top"><div><a href={"/profile/"+item.poster}><img className = "post-profile-pic" src={"http://127.0.0.1:80"+item.postppic}></img></a></div><div>{item.poster} on <a href={"/community/"+item.community}>{item.community}</a></div></div>
+        <div className = "ptext">
+          <p>
+              {item.content}</p>
+            </div>
+            <div className="image">
+            <img className = "post-image" src={"http://127.0.0.1:80"+item.flocation}></img>
+        </div>
+        <div className="bottom">
+
+            <div className ="likes">
+              {item.likes}
+            </div>
+            <div className ="comments">
+            </div>
+            <form onSubmit={sub}>
+            <input className="in cl si" type="text" name="title" placeholder="Title" onChange={e => comment = e}></input>
+            <input type="submit" style="display:none"></input>
+            </form>
+        </div>
       </div>
-      <div className="bottom">
-          <div className = "ptext">
-            Content: {item.content}
-          </div>
-          <div className ="likes">
-            {item.likes}
-          </div>
-          <div className ="comments">
-          </div>
-      </div>
-    </div>
     );
   }
   
