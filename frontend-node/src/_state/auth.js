@@ -1,9 +1,9 @@
 import { atom } from 'recoil';
 
 const authAtom = atom({
-    key: 'access_token',
+    key: 'user',
     // get initial state from local storage to enable user to stay logged in
-    default: JSON.parse(localStorage.getItem('access_token'))
+    default: JSON.parse(localStorage.getItem('user')).access_token
 });
 
 export { authAtom };

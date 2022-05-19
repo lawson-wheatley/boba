@@ -13,12 +13,11 @@ function Home() {
   const users = useRecoilValue(usersAtom);
   const userActions = useUserActions();
   const fetchWrapper = useFetchWrapper();
-  const items = fetchWrapper.get("http://34.85.215.122/feed");
-  console.log(localStorage);
+  const items = fetchWrapper.get("http://34.85.215.122/feed", 0);
+  console.log(items);
   useEffect(() => {
       userActions.getAll();
   }, []);
-  console.log(items)
     return (
       <div className="feed">
         {items.map(item => postFeed(item))}

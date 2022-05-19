@@ -1,12 +1,13 @@
-import React from "react";
+import * as React from "react";
 import logo from './logo.svg';
 import { useFetchWrapper } from "./_helpers";
+import { useParams } from 'react-router-dom';
 import Comment from './Comment';
 
 function Post() {
   const fetchWrapper = useFetchWrapper();
-  const item = fetchWrapper.get("api.instaswatch.com/post/");
-  const comments = fetchWrapper.get("api.instaswatch.com/comments/");
+  const { id } = useParams();
+  const item = fetchWrapper.get("api.instaswatch.com/post/"+id);
     return (
       <div className="post">
           <div className="image">
@@ -25,7 +26,7 @@ function Post() {
               {item.likes}
             </div>
             <div className ="comments">
-              {comments.map(item => Comment(item))}
+
             </div>
         </div>
       </div>

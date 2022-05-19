@@ -22,7 +22,6 @@ function useUserActions () {
             .then(user => {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
-                console.log("CHC");
                 setAuth(user);
 
                 // get return url from location state or default to home page

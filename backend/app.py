@@ -30,12 +30,15 @@ def allowed_file(filename):
 @jwt_required()
 def upload():
     user = get_jwt_identity()
+    community = request.json.get("community", None)
     posttext = request.json.get("text", None)
     title = request.json.get("title", None)
     post = Post()
     post.poster = user;
     post.posttitle = title;
     post.content = posttext;
+    if community:
+        post.community = community
     if 'file' not in request.files:
         return jsonify({"message" : "Posted!"}), 200
     f = request.files['file']
@@ -56,7 +59,7 @@ def upload():
     db.session.add([post, comments, likes])
     db.session.commit()
 
-    return jsonify({"message": "Unknown Error"}), 400
+    return jsonify({"message": "Completed"}), 200
 
 @api.route("/comment", methods=["POST"])
 @jwt_required()
@@ -95,8 +98,7 @@ def refresh_expiring_jwt(response):
 def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
-    following = User.query.filter(User.id == current_user).first().following;
-    posts = Post.query.filter(Post.poster.in_(following)).paginate(0, 25, False);
+    posts = Post.query.paginate(0, 25, False);
     return jsonify(posts), 200;
 
 @api.route("/follow", methods=["POST"])
@@ -104,7 +106,7 @@ def feed():
 def follow():
     current_user = get_jwt_identity()
     to_follow = request.json.get("to_follow", None)
-    user = User.query.filter(User.id == to_follow).first()
+    user = User.query.filter(User.username == to_follow).first()
     if not user:
         return jsonify({"message":"User not found"}), 400
     user.followers.insert(current_user)

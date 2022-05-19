@@ -34,7 +34,7 @@ function useFetchWrapper() {
     function authHeader(url) {
         // return auth header with jwt if user is logged in and request is to the api url
         console.log("ISAPI:")
-        const token = auth?.token;
+        const token = JSON.parse(localStorage.getItem('user')).access_token;
         const isLoggedIn = !!token;
         const isApiUrl = true
         if (isLoggedIn && isApiUrl) {
