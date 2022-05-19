@@ -1,9 +1,11 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import logo from './logo.svg';
 import { useFetchWrapper } from "./_helpers";
 
 
-function Following() {
+function Followers() {
+  const {id} = useParams();
     return (
       <div className="notification">
         <div className="notiftype">
@@ -14,4 +16,4 @@ function Following() {
       </div>
     );
   }
-export default Following;
+export default Followers;

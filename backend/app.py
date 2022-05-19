@@ -117,6 +117,12 @@ def refresh_expiring_jwt(response):
     except (RuntimeError, KeyError):
         return response
     
+@api.route("/get-username", methods=["GET"])
+@jwt_required()
+def getUsername():
+    current_user = get_jwt_identity()
+    usr = User.query.filter(User.id == current_user).first()
+    return jsonify(username=usr.username), 200
 
 @api.route("/feed", methods = ["GET"])
 @jwt_required()
@@ -125,7 +131,7 @@ def feed():
     page = request.args.get("page")
     posts = Post.query.paginate(0, 25, False)
     print(posts.items[0].__dict__)
-    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200;
+    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
 
 def convert_post_to_json(post):
     dic = {"flocation":post.flocation,
@@ -192,6 +198,49 @@ def postComments(idd):
     else:
         return jsonify({"message":"Not found"}), 404
 
+@api.route("/profile/<id>", methods=["GET"])
+@jwt_required()
+def getProfile(id):
+    print("HUH")
+    usr = User.query.filter(User.username == id).first()
+    return jsonify(getProfileInfo(usr)), 200
+
+@api.route("/modifyppic", methods=["POST"])
+@jwt_required()
+def modifyppic():
+    current_user = get_jwt_identity()
+    file = request.json.get("file", None)
+    fileName = request.json.get("filename", None)
+    usr = User.query.filter(User.id == current_user).first()
+    if allowed_file(fileName):
+        val = os.path.splitext(fileName)
+        full_final_name = str(uuid.uuid4()) + val[1]
+        post_location = os.path.join(f"{basedir}/storage/", full_final_name)
+        missing_padding = len(file) % 4
+        file = str.encode(file)
+        if missing_padding:
+            file += b'='* (4 - missing_padding)
+        decoded = base64.decodebytes(file)
+        with open(post_location, "wb") as fh:
+            fh.write(decoded)
+        usr.picture = f"/storage/{full_final_name}"
+        db.session.commit()
+        return {"redirect":f"/profile/{usr.username}"}, 200
+    return {"message":"Error"}, 400
+
+@api.route("/profile/<id>/feed", methods=["GET"])
+@jwt_required()
+def getFeed(id):
+    usr = User.query.filter(User.username == id).first()
+    page = request.args.get("page")
+    posts = Post.query.filter(Post.poster == usr.id).paginate(0, 25, False)
+    print(posts.items[0].__dict__)
+    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
+
+def getProfileInfo(profile):
+    dic = {"username":profile.username,"displayname":profile.displayName, "joined":profile.joined, "picture":profile.picture}
+    print(dic)
+    return dic
 
 @api.route("/post/<idd>", methods=["GET"])
 @jwt_required()

@@ -28,7 +28,8 @@ function Upload(item) {
 
   function changeFileEvent(e){
     setFilename(e.target.files[0].name);
-    var f = getBase64(e.target.files[0])}
+    getBase64(e.target.files[0]);
+  }
   function uploa() {
     return fetchWrapper.post("http://127.0.0.1:80/upload", {"file":file,"filename": filename, "title":title,"community":community, "text":text});
   }
