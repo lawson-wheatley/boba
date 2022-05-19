@@ -34,9 +34,9 @@ def upload():
     posttext = request.json.get("text", None)
     title = request.json.get("title", None)
     post = Post()
-    post.poster = user;
-    post.posttitle = title;
-    post.content = posttext;
+    post.poster = user
+    post.posttitle = title
+    post.content = posttext
     if community:
         post.community = community
     if 'file' not in request.files:
@@ -56,6 +56,7 @@ def upload():
     likes = Likes()
     likes.post_id = post.id
     likes.post = post
+    print(post)
     db.session.add([post, comments, likes])
     db.session.commit()
 
