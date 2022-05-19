@@ -198,10 +198,9 @@ def postComments(idd):
     else:
         return jsonify({"message":"Not found"}), 404
 
-@api.route("/profile/<id>", methods=["GET"])
+@api.route("/get-profile/<id>", methods=["GET"])
 @jwt_required()
 def getProfile(id):
-    print("HUH")
     usr = User.query.filter(User.username == id).first()
     return jsonify(getProfileInfo(usr)), 200
 
@@ -209,6 +208,7 @@ def getProfile(id):
 @jwt_required()
 def modifyppic():
     current_user = get_jwt_identity()
+    print(request.json)
     file = request.json.get("file", None)
     fileName = request.json.get("filename", None)
     usr = User.query.filter(User.id == current_user).first()
@@ -225,8 +225,8 @@ def modifyppic():
             fh.write(decoded)
         usr.picture = f"/storage/{full_final_name}"
         db.session.commit()
-        return {"redirect":f"/profile/{usr.username}"}, 200
-    return {"message":"Error"}, 400
+        return jsonify({"redirect":f"/profile/{usr.username}"}), 200
+    return jsonify({"message":"Error"}), 400
 
 @api.route("/profile/<id>/feed", methods=["GET"])
 @jwt_required()
