@@ -134,12 +134,15 @@ def feed():
     return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
 
 def convert_post_to_json(post):
+    poster = User.query.filter(User.id==post.poster).first()
+    print(poster.picture)
     dic = {"flocation":post.flocation,
            "community":post.community,
            "content":post.content,
            "id":post.id,
            "isText":post.isText,
-           "poster":User.query.filter(User.id==post.poster).first().username,
+           "poster": poster.username,
+           "postppic": poster.picture,
            "title":post.posttitle,
            "timestamp":post.timestamp}
     

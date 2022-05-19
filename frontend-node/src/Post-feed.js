@@ -6,14 +6,16 @@ function postFeed(item) {
   console.log(item);
     return (
       <div className="post">
-        <div className="post-top"><span className="post-title">{item.title}</span> by <a href={"/profile/"+item.poster}>{item.poster}</a></div>
-        <div className="image post-image">
+        <div className="post-top"><a href={"/profile/"+item.poster}><img className = "post-profile-pic" src={"http://127.0.0.1:80"+item.postppic}></img></a>{item.poster} </div>
+        <div className = "ptext">
+          <p>
+              {item.content}</p>
+            </div>
+            <div className="image">
             <img className = "post-image" src={"http://127.0.0.1:80"+item.flocation}></img>
         </div>
         <div className="bottom">
-            <div className = "ptext">
-              Content: {item.content}
-            </div>
+
             <div className ="likes">
               {item.likes}
             </div>

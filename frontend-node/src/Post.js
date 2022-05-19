@@ -9,7 +9,9 @@ function Post() {
   const { id } = useParams();
   const item = fetchWrapper.get("api.instaswatch.com/post/"+id);
     return (
+      
       <div className="post">
+         <span className="post-title">{item.title}</span>
       <div className="post-top"><span className="post-title">{item.title}</span> by <a href={"/profile/"+item.poster}>{item.poster}</a></div>
       <div className="image post-image">
           <img className = "post-image" src={"http://127.0.0.1:80"+item.flocation}></img>

@@ -42,7 +42,7 @@ function Upload(item) {
               <form className="lf" >
                   <input className="in cl si" type="text" name="title" placeholder="Title" onChange={e => setTitle(e.target.value)}></input>
                   <input className="in cl si" type="text" name="community" placeholder="Community" onChange={e => setCommunity(e.target.value)}></input>
-                  <input className="in cl si" type="textbox" name="posttext" placeholder="Post text" onChange={e => setText(e.target.value)}></input>
+                  <textarea className="in cl si" rows="4" cols="25" name="posttext" placeholder="Post text" onChange={e => setText(e.target.value)}></textarea>
                   <input className="bt in" type="file" name="file" onChange={e => changeFileEvent(e)}/>
                   <input className="bt in" type="submit"></input>
               </form>
