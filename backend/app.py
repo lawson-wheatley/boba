@@ -98,7 +98,7 @@ def refresh_expiring_jwt(response):
 def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
-    posts = Post.query.paginate(0, 25, False);
+    posts = Post.query.paginate(0, 25, False)
     return jsonify(posts), 200;
 
 @api.route("/follow", methods=["POST"])

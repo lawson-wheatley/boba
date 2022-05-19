@@ -47,7 +47,8 @@ class community(db.Model):
 class Post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key = True)
-    posttitle = db.Column(db.String(80), nullable = True)
+    community = db.Column(db.String(80), nullable = True)
+    posttitle = db.Column(db.String(80), nullable = False)
     poster = db.Column(db.Integer, db.ForeignKey('users.id'))
     isText = db.Column(db.Boolean, nullable = False)
     flocation = db.Column(db.String(120), nullable = True)
