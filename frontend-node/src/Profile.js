@@ -61,7 +61,7 @@ function Profile() {
     if (!id && !vala){
       setVal(
         <form className="ch" onSubmit={uploa}>
-        <input className="chp" type="file" name="file" onChange={e => changeFileEvent(e)}/>
+        <input className="chp" title="" value="" type="file" name="file" onChange={e => changeFileEvent(e)}/>
         <input className="chp" type="submit"></input>
       </form>
       );
@@ -74,10 +74,10 @@ function Profile() {
             <div className="pad">
             <div className="profile">
                 <div className = "profile-pic-div"><img className = "profile-pic" src ={"http://127.0.0.1:80/" + userData.picture}></img></div>
+                <div className = "pInfo">
+                <div className = "profile-username">{userData.username}</div>
                 {vala}
                 <form className="lf" ></form>
-                <div id = "profile-username"></div>
-                {userData.username}
                 <div id = "profile-displayname"></div>
                 {userData.displayName}
                 <div id = "profile-bio"></div>
@@ -85,7 +85,8 @@ function Profile() {
                 <div id = "profile-followers"></div>
                 <a href = {"/profile/" + userData.username + "/followers"}></a>
                 <div id = "profile-following"></div>
-                <a href = {userData.username + "/following"}></a>
+                <a href = {"/"+ userData.username + "/following"}></a>
+                </div>
             </div>
             <div className="profile-posts centerPos">
                 <div className="feed">
