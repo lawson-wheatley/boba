@@ -99,7 +99,8 @@ def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
     posts = Post.query.paginate(0, 25, False)
-    return jsonify(posts), 200;
+    print(posts.items)
+    return jsonify(posts.items), 200;
 
 @api.route("/follow", methods=["POST"])
 @jwt_required()
