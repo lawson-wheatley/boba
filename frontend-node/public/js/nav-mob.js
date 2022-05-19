@@ -56,7 +56,7 @@ function vs(){
             <a class = "aa" href = "/notifications">
                 <img class="mob-navimg" src="/img/notification.svg"/>
             </a>
-            <a class = "aa" href = "/upload">
+            <a class = "aa" href = "/profile">
                 <img class="mob-navimg" src="/img/profile.svg"/>
             </a>
         </ul>
@@ -97,7 +97,7 @@ else{
                     </a>
                 </li>
                 <li class="nlipl25">
-                    <a class = "aa" href = "/upload">
+                    <a class = "aa" href = "/profile">
                         <img class="navimg" src="/img/profile.svg"></img>
                     </a>
                 </li>

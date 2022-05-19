@@ -32,6 +32,7 @@ class User(db.Model):
     
     picture = db.Column(db.String, nullable = True)
 
+
 user_following = db.Table(
     'user_following', db.metadata,
     db.Column('user_id', db.Integer, db.ForeignKey(User.id), primary_key=True),
@@ -77,6 +78,7 @@ class Likes(db.Model):
     __tablename__ = "likes"
     id = db.Column(db.Integer, primary_key = True)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    number = db.Column(db.Integer)
     post = db.relationship("Post", back_populates="likes")
     likm = db.relationship("Like")
 

@@ -1,9 +1,10 @@
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
 from models import db
-from flask import Flask, request, jsonify, make_response, g
+from flask import Flask, request, jsonify, make_response, g, send_from_directory
 from datetime import datetime, timedelta, timezone
 from flask_migrate import Migrate
 from flask_restful import Resource, wraps
+import base64
 
 
 import hashlib, os, uuid, json
@@ -26,39 +27,61 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'webp'])
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@api.route("/storage/<id>")
+def retFile(id):
+    return send_from_directory('storage', id)
 @api.route("/upload", methods=["POST"])
 @jwt_required()
 def upload():
-    user = get_jwt_identity()
     print(request.json)
+    user = get_jwt_identity()
     community = request.json.get("community", None)
     posttext = request.json.get("text", None)
     title = request.json.get("title", None)
+    file = request.json.get("file", None)
+    fileName = request.json.get("filename", None)
     post = Post()
     post.poster = user
     post.posttitle = title
     post.content = posttext
     if community:
         post.community = community
-    if 'file' not in request.files:
+    if fileName == "":
+        post.isText = True
+        comments = Comments()
+        comments.post_id = post.id
+        comments.post = post
+        likes = Likes()
+        likes.post_id = post.id
+        likes.post = post
+        db.session.add(post)
+        db.session.add(comments)
+        db.session.add(likes)
+        db.session.commit()
         return jsonify({"message" : "Posted!"}), 200
-    f = request.files['file']
-    if f.filename == '':
-        return jsonify({"message" : "No file selected for uploading"}), 400
-    if f and allowed_file(f.filename):
-        val = os.path.splitext(f.name)
+    
+    if allowed_file(fileName):
+        val = os.path.splitext(fileName)
         full_final_name = str(uuid.uuid4()) + val[1]
-        post_location = f"/storage/{full_final_name}"
-        f.save(post_location)
-        post.flocation = post_location
+        post_location = os.path.join(f"{basedir}/storage/", full_final_name)
+        missing_padding = len(file) % 4
+        file = str.encode(file)
+        if missing_padding:
+            file += b'='* (4 - missing_padding)
+        decoded = base64.decodebytes(file)
+        with open(post_location, "wb") as fh:
+            fh.write(decoded)
+        post.flocation = f"/storage/{full_final_name}"
+    post.isText = False
     comments = Comments()
     comments.post_id = post.id
     comments.post = post
     likes = Likes()
     likes.post_id = post.id
     likes.post = post
-    print(post)
-    db.session.add([post, comments, likes])
+    db.session.add(post)
+    db.session.add(comments)
+    db.session.add(likes)
     db.session.commit()
 
     return jsonify({"message": "Completed"}), 200
@@ -101,9 +124,20 @@ def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
     posts = Post.query.paginate(0, 25, False)
-    print(posts.items)
-    return jsonify(posts.items), 200;
+    print(posts.items[0].__dict__)
+    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200;
 
+def convert_post_to_json(post):
+    dic = {"flocation":post.flocation,
+           "community":post.community,
+           "content":post.content,
+           "id":post.id,
+           "isText":post.isText,
+           "poster":User.query.filter(User.id==post.poster).first().username,
+           "title":post.posttitle,
+           "timestamp":post.timestamp}
+    
+    return dic
 @api.route("/follow", methods=["POST"])
 @jwt_required()
 def follow():

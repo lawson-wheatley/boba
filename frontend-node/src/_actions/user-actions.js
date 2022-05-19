@@ -6,7 +6,7 @@ import { authAtom, usersAtom } from '../_state';
 export { useUserActions };
 
 function useUserActions () {
-    const baseUrl = `http://34.85.215.122`;
+    const baseUrl = `http://127.0.0.1:80`;
     const fetchWrapper = useFetchWrapper();
     const setAuth = useSetRecoilState(authAtom);
     const setUsers = useSetRecoilState(usersAtom);

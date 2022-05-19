@@ -1,4 +1,5 @@
-import React from "react";
+import React, {useState} from "react";
+
 import logo from './logo.svg';
 import { useFetchWrapper } from "./_helpers";
 import { useForm } from "react-hook-form";
@@ -7,33 +8,41 @@ import * as Yup from 'yup';
 
 function Upload(item) {
   const fetchWrapper = useFetchWrapper();
-  const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    community: Yup.string().required('Community is required'),
-    posttext: Yup.string(),
-    file: Yup.mixed(),
-  });
-  const formOptions = { resolver: yupResolver(validationSchema) };
-  const { register, handleSubmit, setError, formState } = useForm(formOptions);
-  const { errors, isSubmitting } = formState;
-  function fucker({ email, password, file, title, community}) {
-    return fetchWrapper.post("http://34.85.215.122/upload", {email,password,file,title,community})
-      .catch(error => {
-        setError('apiError', { message: error });
-    }
-  );
+  const [community, setCommunity] = useState("");
+  const [title, setTitle] = useState("");
+  const [file, setFile] = useState("");
+  const [text, setText] = useState("");
+  const [filename, setFilename] = useState ("");
+  function getBase64(file) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      var base64String = reader.result.replace("data:", "")
+      .replace(/^.+,/, "");
+      setFile(base64String);
+    };
+    reader.onerror = function (error) {
+      console.log('Error: ', error);
+    };
+ }
+
+  function changeFileEvent(e){
+    setFilename(e.target.files[0].name);
+    var f = getBase64(e.target.files[0])}
+  function uploa() {
+    return fetchWrapper.post("http://127.0.0.1:80/upload", {"file":file,"filename": filename, "title":title,"community":community, "text":text});
   }
   return (
-    
+
       <div className="login-containerv">
           <div className = "login-containerh">
     <div className="container-bubble">
-          <div className="loginform lf" onSubmit={handleSubmit(fucker)}>
+          <div className="loginform lf" onSubmit={uploa}>
               <form className="lf" >
-                  <input className="in cl si" type="text" name="title" placeholder="Title" {...register('title')}></input>
-                  <input className="in cl si" type="text" name="community" placeholder="Community" {...register('community')}></input>
-                  <input className="in cl si" type="textbox" name="posttext" placeholder="Post text" {...register('posttext')}></input>
-                  <input className="bt in" type="file" name="file" {...register('file')}/>
+                  <input className="in cl si" type="text" name="title" placeholder="Title" onChange={e => setTitle(e.target.value)}></input>
+                  <input className="in cl si" type="text" name="community" placeholder="Community" onChange={e => setCommunity(e.target.value)}></input>
+                  <input className="in cl si" type="textbox" name="posttext" placeholder="Post text" onChange={e => setText(e.target.value)}></input>
+                  <input className="bt in" type="file" name="file" onChange={e => changeFileEvent(e)}/>
                   <input className="bt in" type="submit"></input>
               </form>
               <span className="fp" > Forgot password? </span>
