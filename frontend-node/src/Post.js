@@ -10,17 +10,17 @@ function Post() {
   const item = fetchWrapper.get("api.instaswatch.com/post/"+id);
   var comment = "";
   function sub() {
-    return fetchWrapper.post("http://127.0.0.1:80/makecomment", {"comment":comment, "id":item.id});
+    return fetchWrapper.post(process.env.REACT_APP_API_URL+"/makecomment", {"comment":comment, "id":item.id});
   }
     return (
       <div className="post">
-        <div className="post-top"><div><a href={"/profile/"+item.poster}><img className = "post-profile-pic" src={"http://127.0.0.1:80"+item.postppic}></img></a></div><div>{item.poster} on <a href={"/community/"+item.community}>{item.community}</a></div></div>
+        <div className="post-top"><div><a href={"/profile/"+item.poster}><img className = "post-profile-pic" src={process.env.REACT_APP_API_URL+item.postppic}></img></a></div><div>{item.poster} on <a href={"/community/"+item.community}>{item.community}</a></div></div>
         <div className = "ptext">
           <p>
               {item.content}</p>
             </div>
             <div className="image">
-            <img className = "post-image" src={"http://127.0.0.1:80"+item.flocation}></img>
+            <img className = "post-image" src={process.env.REACT_APP_API_URL+item.flocation}></img>
         </div>
         <div className="bottom">
 
