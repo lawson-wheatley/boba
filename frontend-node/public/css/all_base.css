@@ -27,7 +27,85 @@
     padding-right: 15px;
     padding-bottom: 10px;
 }
-
+.bubble{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size:xx-large;
+    width: 20vw;
+    height: 20vw;
+    position: absolute;
+    top: 4vw;
+    left: 5vw;
+    border-radius: 50%;
+    background-color:#70b3e2;
+}
+.bubble1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size:xx-large;
+    width: 20vw;
+    height: 20vw;
+    position: absolute;
+    top: 12vw;
+    left: 28vw;
+    border-radius: 50%;
+    background-color:#7b70e2;
+    
+}
+.bubble2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size:xx-large;
+    width: 20vw;
+    height: 20vw;
+    position: absolute;
+    top: 28vw;
+    left: 12vw;
+    border-radius: 50%;
+    background-color:#70e2e2;
+    
+}
+.bubble3{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size:xx-large;
+    width: 20vw;
+    height: 20vw;
+    position: absolute;
+    top: 28vw;
+    left: 48vw;
+    border-radius: 50%;
+    background-color:#70e2a3;
+    
+}
+.bubble4{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size:xx-large;
+    width: 20vw;
+    height: 20vw;
+    position: absolute;
+    top: 8vw;
+    left: 63vw;
+    border-radius: 50%;
+    background-color:#e270c5;
+    
+}
 
 @media only screen and (min-width:769px){
     .create{

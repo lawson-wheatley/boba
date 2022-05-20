@@ -14,11 +14,13 @@ import { BrowserRouter, useState, Routes, Route } from "react-router-dom";
 
 import Profile from './Profile'
 import CreateCommunity from "./CreateCommunity";
+import Bubbles from "./Bubbles";
 function App() {
   return (
   <RecoilRoot>
   <BrowserRouter>
     <Routes>
+    <Route path="/bubbles/" element={<Bubbles/>} />
     <Route path="/bubble/:id" element={<Community />} />
     <Route path="/createcommunity" element={<CreateCommunity />} />
     <Route path="/login" element={<Login />} />

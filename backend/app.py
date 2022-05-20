@@ -130,8 +130,6 @@ def convert_community_to_json(community, user):
     isModerating = User.query.filter(User.id == user).first().moderating
     community = Community.query.filter(Community.name == community).first()
     dic = {"name":community.name, "picture":community.picture,"id":community.id, "isMod": f"{community in isModerating}"}
-    print("Should be working...")
-    print(dic)
     return dic
 
 @api.route("/community/<id>/feed")
@@ -273,6 +271,16 @@ def postComments(idd):
 def getProfile(id):
     usr = User.query.filter(User.username == id).first()
     return jsonify(getProfileInfo(usr)), 200
+
+@api.route("/bubbles", methods=["GET"])
+def bubbles():
+    #current_user = get_jwt_identity()
+    communities = Community.query.paginate(0,25,False)
+    return jsonify([convert_community_to_json_noauth(communities.items[i]) for i in range(len(communities.items))]), 200
+
+def convert_community_to_json_noauth(community):
+    dic = {"name":community.name, "picture":community.picture,"id":community.id}
+    return dic
 
 @api.route("/modifyppic", methods=["POST"])
 @jwt_required()
