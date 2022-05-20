@@ -19,7 +19,7 @@ function Bubbles() {
   const [loaded, finishedLoading] = useState(false);
   const [itms, setItems] = useState([])
   if(!loaded){
-    fetchWrapper.get(REACT_APP_API_URL+"/bubbles").then(result => {
+    fetchWrapper.get(process.env.REACT_APP_API_URL+"/bubbles").then(result => {
       delete result.access_token;
       finishedLoading(true);
       console.log(result);
