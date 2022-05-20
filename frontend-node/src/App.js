@@ -8,15 +8,19 @@ import Upload from './Upload';
 import Followers from './Followers';
 import { RecoilRoot } from "recoil";
 import Following from './Following';
+import Community from "./Community";
 import { BrowserRouter, useState, Routes, Route } from "react-router-dom";
 //import Upload from './Upload'
 
 import Profile from './Profile'
+import CreateCommunity from "./CreateCommunity";
 function App() {
   return (
   <RecoilRoot>
   <BrowserRouter>
     <Routes>
+    <Route path="/bubble/:id" element={<Community />} />
+    <Route path="/createcommunity" element={<CreateCommunity />} />
     <Route path="/login" element={<Login />} />
     <Route path="/" element={<Home />} />
     <Route path="/profile/:id" element={<Profile />} />

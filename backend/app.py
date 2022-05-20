@@ -3,6 +3,7 @@ from models import db
 from flask import Flask, request, jsonify, make_response, g, send_from_directory
 from datetime import datetime, timedelta, timezone
 from flask_migrate import Migrate
+from sqlalchemy import desc
 from flask_restful import Resource, wraps
 import base64
 
@@ -18,7 +19,7 @@ db.init_app(api)
 migrate = Migrate(api, db)
 with api.app_context():
     db.create_all()
-from models import User, Comments, Comment, Likes, Like, Post, user_following
+from models import User, Comments, Comment, Likes, Like, Post, user_following, Community, user_moderating, user_following_community
 
 jwt = JWTManager(api)
 
@@ -101,6 +102,73 @@ def comment():
     comments.coms.insert(com)
     db.session.commit()
 
+@api.route("/create-community", methods=["POST"])
+@jwt_required()
+def create_community():
+    user = get_jwt_identity()
+    print(request.json)
+    community_name = request.json.get("community", None)
+    community = Community.query.filter(Community.name == community_name).first()
+    if community:
+        return jsonify({"message":"community already created"}), 400
+    community = Community()
+
+    community.name = community_name
+    user = User.query.filter(User.id == user).first()
+    user.moderating.insert(user.id, community)
+    db.session.add(community)
+    db.session.commit()
+    return jsonify({"message":"success!"}), 200
+
+@api.route("/get-community/<id>")
+@jwt_required()
+def getCommunity(id):
+    user = get_jwt_identity()
+    return jsonify(convert_community_to_json(id, user)), 200
+
+def convert_community_to_json(community, user):
+    isModerating = User.query.filter(User.id == user).first().moderating
+    community = Community.query.filter(Community.name == community).first()
+    dic = {"name":community.name, "picture":community.picture,"id":community.id, "isMod": f"{community in isModerating}"}
+    print("Should be working...")
+    print(dic)
+    return dic
+
+@api.route("/community/<id>/feed")
+@jwt_required()
+def communityfeed(id):
+    user = get_jwt_identity()
+    page = request.args.get("page")
+    posts = Post.query.filter(Post.community == id).paginate(0, 25, False)
+    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
+
+@api.route("/modify-community-pic", methods=["POST"])
+@jwt_required()
+def modifycommunitypic():
+    current_user = get_jwt_identity()
+    print(request.json)
+    file = request.json.get("file", None)
+    fileName = request.json.get("filename", None)
+    community = request.json.get("community", None)
+    current_user = User.query.filter(User.id == current_user).first()
+    community = Community.query.filter(Community.name == community).first()
+    if community in current_user.moderating:
+        if allowed_file(fileName):
+            val = os.path.splitext(fileName)
+            full_final_name = str(uuid.uuid4()) + val[1]
+            post_location = os.path.join(f"{basedir}/storage/", full_final_name)
+            missing_padding = len(file) % 4
+            file = str.encode(file)
+            if missing_padding:
+                file += b'='* (4 - missing_padding)
+            decoded = base64.decodebytes(file)
+            with open(post_location, "wb") as fh:
+                fh.write(decoded)
+            community.picture = f"/storage/{full_final_name}"
+            db.session.commit()
+            return jsonify({"redirect":f"/profile/{usr.username}"}), 200
+    return jsonify({"message":"Error"}), 400
+
 @api.after_request
 def refresh_expiring_jwt(response):
     try:
@@ -130,7 +198,6 @@ def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
     posts = Post.query.paginate(0, 25, False)
-    print(posts.items[0].__dict__)
     return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
 
 def convert_post_to_json(post):

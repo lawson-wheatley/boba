@@ -104,7 +104,8 @@
         padding-top: 10px;
         padding-bottom: 10px;
         display: block;
-        border: 1px solid #9e9e9e;
+        border-top: 1px solid #9e9e9e;
+        border-bottom: 1px solid #9e9e9e;
         width: 100%;
     }
     .centerPos{
@@ -358,4 +359,9 @@ body{margin: 0;padding: 0; background-color: #eeeeee;}
     background-color:#70b3e2;
     border-radius: 0.5vh;
     margin-top: 10px;
+    transition: 0.25s;
+}
+.abutton:hover{
+    transition: 0.25s;
+    background-color:#5588ad;
 }

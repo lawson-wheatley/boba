@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+
 from sqlalchemy.sql import func
 
 db = SQLAlchemy()
@@ -29,6 +30,11 @@ class User(db.Model):
         secondaryjoin=lambda: User.id == user_following.c.following_id,
         backref='followers'
     )
+    moderating = db.relationship("Community",
+                    secondary="user_moderating")
+    
+    comm_following = db.relationship("Community",
+                    secondary="user_following_community")
     
     picture = db.Column(db.String, nullable = True)
 
@@ -39,11 +45,22 @@ user_following = db.Table(
     db.Column('following_id', db.Integer, db.ForeignKey(User.id), primary_key=True)
 )
 
-class community(db.Model):
+class Community(db.Model):
     __tablename__ = "community"
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(40), unique=True, nullable=False)
-
+    picture = db.Column(db.String, nullable = True)
+    
+user_moderating = db.Table(
+    "user_moderating", db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey(User.id), primary_key=True),
+    db.Column('community_id', db.Integer, db.ForeignKey(Community.id), primary_key=True)
+)
+user_following_community = db.Table(
+    "user_following_community", db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey(User.id), primary_key=True),
+    db.Column('community_id', db.Integer, db.ForeignKey(Community.id), primary_key=True)
+)
     
 class Post(db.Model):
     __tablename__ = "posts"
