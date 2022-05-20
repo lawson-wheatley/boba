@@ -31,7 +31,7 @@ def allowed_file(filename):
 @api.route("/storage/<id>")
 def retFile(id):
     return send_from_directory('storage', id)
-@api.route("/upload", methods=["POST"])
+@api.route("/upload", methods=["POST", "OPTIONS"])
 @jwt_required()
 def upload():
     print(request.json)
