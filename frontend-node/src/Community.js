@@ -36,11 +36,11 @@ function Community() {
     setUpload(true);
   }
 
-  useEffect(() => { if(upload){fetchWrapper.post("http://127.0.0.1:80/modify-community-pic", {"community":id, "file":file,"filename": filename})} }, [file, filename, upload]);
-  useEffect(() => { fetchWrapper.get("http://127.0.0.1:80/get-community/"+iid).then(result =>{setCommunityData(result);}) }, [iid]);
+  useEffect(() => { if(upload){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modify-community-pic", {"community":id, "file":file,"filename": filename})} }, [file, filename, upload]);
+  useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-community/"+iid).then(result =>{setCommunityData(result);}) }, [iid]);
 
   if(iid && communityData && !loaded){
-        fetchWrapper.get("http://127.0.0.1:80/community/"+id+"/feed").then(result => {
+        fetchWrapper.get(process.env.REACT_APP_API_URL+"/community/"+id+"/feed").then(result => {
           delete result.access_token;
           finishedLoading(true);
           setItems(result);
@@ -60,7 +60,7 @@ function Community() {
         <div className="center">
             <div className="pad">
             <div className="profile">
-                <div className = "profile-pic-div"><img className = "profile-pic" src ={"http://127.0.0.1:80/" + communityData.picture}></img></div>
+                <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL+ "/" + communityData.picture}></img></div>
                 <div className = "pInfo">
                 <div className = "profile-username">{communityData.name}</div>
                 {vala}

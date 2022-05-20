@@ -6,7 +6,7 @@ function CreateCommunity(item) {
   const [community, setCommunity] = useState ("");
   const [communityText, setCommunityText] = useState ("");
   function uploa() {
-    return fetchWrapper.post("http://127.0.0.1:80/create-community", {"community":community, "text":communityText});
+    return fetchWrapper.post(process.env.REACT_APP_API_URL+"/create-community", {"community":community, "text":communityText});
   }
   return (
 

@@ -7,7 +7,7 @@ import { useFetchWrapper } from "./_helpers";
 import { useUserActions } from "./_actions";
 
 function Home() {
-
+  console.log(process.env.REACT_APP_API_URL);
   const [appState, setAppState] = useState({
     loading: false,
     repos: null,
@@ -19,10 +19,10 @@ function Home() {
   const [loaded, finishedLoading] = useState(false);
   const [itms, setItems] = useState([])
   function likeContent(id){
-    fetchWrapper.post("http://127.0.0.1:80/like", {"id":id})
+    fetchWrapper.post(process.env.REACT_APP_API_URL+"/like", {"id":id})
   }
   if(!loaded){
-    fetchWrapper.get("http://127.0.0.1:80/feed").then(result => {
+    fetchWrapper.get(process.env.REACT_APP_API_URL+"/feed").then(result => {
       delete result.access_token;
       finishedLoading(true);
       console.log(result);

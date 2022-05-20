@@ -31,7 +31,7 @@ function Upload(item) {
     getBase64(e.target.files[0]);
   }
   function uploa() {
-    return fetchWrapper.post("http://127.0.0.1:80/upload", {"file":file,"filename": filename, "title":title,"community":community, "text":text});
+    return fetchWrapper.post(process.env.REACT_APP_API_URL+"/upload", {"file":file,"filename": filename, "title":title,"community":community, "text":text});
   }
   return (
 

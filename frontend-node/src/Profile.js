@@ -38,12 +38,12 @@ function Profile() {
     setUpload(true);
   }
 
-  useEffect(() => { if(upload){fetchWrapper.post("http://127.0.0.1:80/modifyppic", {"file":file,"filename": filename})} }, [file, filename, upload]);
-  useEffect(() => { fetchWrapper.get("http://127.0.0.1:80/get-profile/"+iid).then(result =>{setUserdata(result);}) }, [iid]);
+  useEffect(() => { if(upload){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modifyppic", {"file":file,"filename": filename})} }, [file, filename, upload]);
+  useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-profile/"+iid).then(result =>{setUserdata(result);}) }, [iid]);
 
 
   if(!iid){
-      fetchWrapper.get("http://127.0.0.1:80/get-username")
+      fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-username")
       .then(result =>
       {setId(result.username);
         console.log(result.username);
@@ -51,7 +51,7 @@ function Profile() {
   }
 
   if(iid && userData && !loaded){
-        fetchWrapper.get("http://127.0.0.1:80/profile/"+iid+"/feed").then(result => {
+        fetchWrapper.get(process.env.REACT_APP_API_URL+"/profile/"+iid+"/feed").then(result => {
           delete result.access_token;
           finishedLoading(true);
           setItems(result);
@@ -73,7 +73,7 @@ function Profile() {
         <div className="center">
             <div className="pad">
             <div className="profile">
-                <div className = "profile-pic-div"><img className = "profile-pic" src ={"http://127.0.0.1:80/" + userData.picture}></img></div>
+                <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL+"/" + userData.picture}></img></div>
                 <div className = "pInfo">
                 <div className = "profile-username">{userData.username}</div>
                 {vala}
