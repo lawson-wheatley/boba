@@ -70,6 +70,13 @@ function Community() {
                 <div className="feed">
                 {items.map(item => PostFeed(item))}
                 </div>
+                <div className="create">
+    <div className="createpost">
+      <img class="mob-navimg moba" src="/img/logo.svg"/>
+      <a href="/upload" class="abutton">Create a Post</a>
+      <a href="/createcommunity" class="abutton">Create a Community</a>
+      </div>
+    </div>
             </div>
         </div>
         </div>
