@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from flask_migrate import Migrate
 from sqlalchemy import desc
 from flask_restful import Resource, wraps
+from flask_cors import CORS
 import base64
 
 
@@ -17,6 +18,7 @@ api.config["JWT_SECRET_KEY"] = "12345678"
 api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
 db.init_app(api)
 migrate = Migrate(api, db)
+CORS(api)
 with api.app_context():
     db.create_all()
 from models import User, Comments, Comment, Likes, Like, Post, user_following, Community, user_moderating, user_following_community
@@ -129,7 +131,8 @@ def getCommunity(id):
 def convert_community_to_json(community, user):
     isModerating = User.query.filter(User.id == user).first().moderating
     community = Community.query.filter(Community.name == community).first()
-    dic = {"name":community.name, "picture":community.picture,"id":community.id, "isMod": f"{community in isModerating}"}
+    dic = {"name":community.name, "color": community.color, "picture":community.picture,"id":community.id, "isMod": f"{community in isModerating}"}
+    print(dic)
     return dic
 
 @api.route("/community/<id>/feed")
@@ -138,7 +141,7 @@ def communityfeed(id):
     user = get_jwt_identity()
     page = request.args.get("page")
     posts = Post.query.filter(Post.community == id).paginate(0, 25, False)
-    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
+    return jsonify([convert_post_to_json(posts.items[i], user) for i in range(len(posts.items))]), 200
 
 @api.route("/modify-community-pic", methods=["POST"])
 @jwt_required()
@@ -164,7 +167,22 @@ def modifycommunitypic():
                 fh.write(decoded)
             community.picture = f"/storage/{full_final_name}"
             db.session.commit()
-            return jsonify({"redirect":f"/profile/{usr.username}"}), 200
+            return jsonify({"redirect":f"/profile/{community.name}"}), 200
+    return jsonify({"message":"Error"}), 400
+
+@api.route("/modify-community-color", methods=["POST"])
+@jwt_required()
+def modifycommunitycolor():
+    current_user = get_jwt_identity()
+    print(request.json)
+    file = request.json.get("color", None)
+    community = request.json.get("community", None)
+    current_user = User.query.filter(User.id == current_user).first()
+    community = Community.query.filter(Community.name == community).first()
+    if community in current_user.moderating:
+        community.color = file[1:]
+        db.session.commit()
+        return jsonify({"redirect":f"/profile/{community.name}"}), 200
     return jsonify({"message":"Error"}), 400
 
 @api.after_request
@@ -196,14 +214,26 @@ def feed():
     current_user = get_jwt_identity()
     page = request.args.get("page")
     posts = Post.query.paginate(0, 25, False)
-    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
+    return jsonify([convert_post_to_json(posts.items[i], current_user) for i in range(len(posts.items))]), 200
 
-def convert_post_to_json(post):
+def convert_post_to_json(post, usr):
+    print(usr)
+    likes = Likes.query.filter(Likes.post_id == post.id).first()
+    likeButton = False
+    if likes.number != 0:
+        isLiked = Like.query.filter(Like.likes_id == likes.id).filter(Like.owner == usr).first()
+        print(Like.query.filter(Like.likes_id == likes.id).first())
+    else:
+        isLiked = False
+    if isLiked:
+        likeButton = True
+    print(isLiked)
     poster = User.query.filter(User.id==post.poster).first()
-    print(poster.picture)
     dic = {"flocation":post.flocation,
            "community":post.community,
            "content":post.content,
+           "isliked": likeButton,
+           "likes": likes.number,
            "id":post.id,
            "isText":post.isText,
            "poster": poster.username,
@@ -272,6 +302,36 @@ def getProfile(id):
     usr = User.query.filter(User.username == id).first()
     return jsonify(getProfileInfo(usr)), 200
 
+@api.route("/like", methods=["POST"])
+@jwt_required()
+def like():
+    user = get_jwt_identity()
+    post = request.json.get("id", None)
+    likes = Likes.query.filter(Likes.post_id == post).first()
+    checkIfLiked = Like.query.filter(Like.likes_id == likes.id)
+    chk = False
+    if checkIfLiked:
+        chk = checkIfLiked.filter(Like.owner == user).first()
+        print(chk)
+    if chk:
+        db.session.delete(chk)
+        likes.number = likes.number - 1
+    else:
+        like = Like()
+        like.text = ""
+        like.likes_id = likes.id
+        like.owner = user
+        if not likes.number:
+            likes.number = 1
+        else:
+            likes.number = likes.number + 1
+        db.session.add(like)
+        likes.likm.insert(likes.id, like)
+        print(like.id)
+
+    db.session.commit()
+    return jsonify({"message":"Liked"}), 200
+
 @api.route("/bubbles", methods=["GET"])
 def bubbles():
     #current_user = get_jwt_identity()
@@ -279,7 +339,7 @@ def bubbles():
     return jsonify([convert_community_to_json_noauth(communities.items[i]) for i in range(len(communities.items))]), 200
 
 def convert_community_to_json_noauth(community):
-    dic = {"name":community.name, "picture":community.picture,"id":community.id}
+    dic = {"name":community.name, "color":community.color,"picture":community.picture,"id":community.id}
     return dic
 
 @api.route("/modifyppic", methods=["POST"])
@@ -309,11 +369,12 @@ def modifyppic():
 @api.route("/profile/<id>/feed", methods=["GET"])
 @jwt_required()
 def getFeed(id):
+    user = get_jwt_identity()
     usr = User.query.filter(User.username == id).first()
     page = request.args.get("page")
     posts = Post.query.filter(Post.poster == usr.id).paginate(0, 25, False)
     print(posts.items[0].__dict__)
-    return jsonify([convert_post_to_json(posts.items[i]) for i in range(len(posts.items))]), 200
+    return jsonify([convert_post_to_json(posts.items[i], user) for i in range(len(posts.items))]), 200
 
 def getProfileInfo(profile):
     dic = {"username":profile.username,"displayname":profile.displayName, "joined":profile.joined, "picture":profile.picture}
@@ -323,9 +384,10 @@ def getProfileInfo(profile):
 @api.route("/post/<idd>", methods=["GET"])
 @jwt_required()
 def get_post(idd):
-    ret = Post.query.filter(Post.id == idd).first()
+    ret = Post.query.filter(Post.id == idd).first();
+    print(ret)
     if ret:
-        return jsonify(ret.items), 200
+        return jsonify(convert_post_to_json(ret, get_jwt_identity())), 200
     return jsonify({"message":"Not found"}), 404
 
 @api.route("/register", methods=["POST","GET"])

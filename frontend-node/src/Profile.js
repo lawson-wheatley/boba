@@ -29,7 +29,9 @@ function Profile() {
       console.log('Error: ', error);
     };
  }
-
+ function likeContent(id){
+  fetchWrapper.post(process.env.REACT_APP_API_URL+"/like", {"id":id})
+}
   function changeFileEvent(e){
     getBase64(e.target.files[0]);
   }
@@ -37,7 +39,7 @@ function Profile() {
   function uploa() {
     setUpload(true);
   }
-
+console.log(process.env.REACT_APP_API_URL+"/modifyppic");
   useEffect(() => { if(upload){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modifyppic", {"file":file,"filename": filename})} }, [file, filename, upload]);
   useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-profile/"+iid).then(result =>{setUserdata(result);}) }, [iid]);
 
@@ -61,9 +63,10 @@ function Profile() {
     if (!id && !vala){
       setVal(
         <form className="ch" onSubmit={uploa}>
-        <input className="chp" title="" value="" type="file" name="file" onChange={e => changeFileEvent(e)}/>
+        <label htmlFor="fiafpa" className="chp cpha">File</label>
+        <input style={{visibility:"hidden", display: "none"}} value="" type="file" name="fiafpa" id = "fiafpa" onChange={e => changeFileEvent(e)}/>
         <input className="chp" type="submit"></input>
-      </form>
+        </form>
       );
     }
 
@@ -73,7 +76,7 @@ function Profile() {
         <div className="center">
             <div className="pad">
             <div className="profile">
-                <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL+"/" + userData.picture}></img></div>
+                <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL + userData.picture}></img></div>
                 <div className = "pInfo">
                 <div className = "profile-username">{userData.username}</div>
                 {vala}
@@ -90,7 +93,7 @@ function Profile() {
             </div>
             <div className="profile-posts centerPos">
                 <div className="feed">
-                {items.map(item => PostFeed(item))}
+                {items.map(item => PostFeed(item, likeContent))}
                 </div>
             </div>
         </div>

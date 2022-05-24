@@ -38,9 +38,9 @@ function Home() {
     </div>
     <div className="create">
     <div className="createpost">
-      <img class="mob-navimg moba" src="/img/logo.svg"/>
-      <a href="/upload" class="abutton">Create a Post</a>
-      <a href="/createcommunity" class="abutton">Create a Community</a>
+      <img className="mob-navimg moba" src="/img/logo.svg"/>
+      <a href="/upload" className="abutton">Create a Post</a>
+      <a href="/createcommunity" className="abutton">Create a Community</a>
       </div>
     </div>
     </div>

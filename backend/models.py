@@ -48,6 +48,7 @@ user_following = db.Table(
 class Community(db.Model):
     __tablename__ = "community"
     id = db.Column(db.Integer, primary_key = True)
+    color = db.Column(db.String(6), unique = False, nullable = True, default="9e9e9e")
     name = db.Column(db.String(40), unique=True, nullable=False)
     picture = db.Column(db.String, nullable = True)
     
