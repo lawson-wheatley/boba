@@ -24,14 +24,22 @@ function App() {
     <Route path="/bubbles/" element={<Bubbles/>} />
     <Route path="/login" element={<Login />} />
     <Route path="/bubble/:id" element={<Community />} />
-    <Route path="/createcommunity" element={<CreateCommunity />} />
     <Route path="/" element={<Home />} />
-    <Route path="/upload" element={<Upload />} />
     <Route path="/profile/:id" element={<Profile />} />
-    <Route path="/profile" element={<Profile />} />
     <Route path="/profile/:id:/followers" element={ <Followers /> }/>
     <Route path="/profile/:id:/following" element={ <Following /> }/>
-    <Route path="/notifications" element={<Notifications/> }/>
+    <Route path="/createcommunity" element={<PrivateRoute/> }>
+      <Route path="/createcommunity" element={<CreateCommunity />} />
+    </Route>
+    <Route path="/notifications" element={<PrivateRoute/> }>
+      <Route path="/notifications" element={<Notifications/> }/>
+    </Route>
+    <Route path="/upload" element={<PrivateRoute/>}>
+      <Route path="/upload" element={<Upload />} />
+    </Route>
+    <Route path="/profile" element={<PrivateRoute/>}>
+      <Route path="/profile" element={<Profile />} />
+    </Route>
     <Route path="/post/:id" element={<Post />} />
 
     </Routes>

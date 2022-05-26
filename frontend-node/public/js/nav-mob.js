@@ -72,8 +72,8 @@ else{
     document.getElementById("nav").innerHTML = `
     <div class="fcnav">
         <div class="c-logo">
-            <img class="nav-logo" src="/img/logo.svg">
-            </img>
+            <a href="/"><img class="nav-logo" src="/img/logo.svg">
+            </img></a>
         </div>
             <form class="rs">
                 <input placeholder="Search..." type="text" class="search"></input>

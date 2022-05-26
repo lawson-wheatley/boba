@@ -75,6 +75,8 @@ function Post() {
       }
       return (
         <div className="postsolopage">
+          <div className="postholder">
+            <div className="centerPos">
       <div className="postsolo">
         <div className = "back">
         <button className = "backButton" onClick={() => history(-1)}><img className="cbut backContent" src="/img/back.svg"></img></button>
@@ -96,6 +98,8 @@ function Post() {
         <div className= "makeComment">
               <textarea className="mccomment" rows="1" placeholder="Make a comment..."></textarea>
             </div>
+      </div>
+      </div>
       </div>
       <button className = "postback" onClick={() => history(-1)}></button>
       </div>

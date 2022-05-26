@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import { useFetchWrapper } from "./_helpers";
 import { useParams } from "react-router-dom";
 import PostFeed from "./Post-feed";
+import { Feed } from "./Feed";
 function Community() {
   const fetchWrapper = useFetchWrapper();
   const {id} = useParams();
@@ -48,14 +49,7 @@ function Community() {
   useEffect(() => { if(changeColor){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modify-community-color", {"community":id, "color":color}).then(result=>console.log(result))} }, [color, changeColor]);
   useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-community/"+iid).then(result =>{setCommunityData(result);}) }, [iid]);
 
-  if(iid && communityData && !loaded){
-        fetchWrapper.get(process.env.REACT_APP_API_URL+"/community/"+id+"/feed").then(result => {
-          delete result.access_token;
-          finishedLoading(true);
-          setItems(result);
-        });
-
-  } else{
+  if(iid && communityData){
     if (communityData.isMod == 'True'){
       console.log(communityData);
       vala = (
@@ -74,6 +68,7 @@ function Community() {
       );
       console.log("HUH");
     }else{}
+    var loca = "/community/"+id
     return (
         <div className="center">
             <div className="pad">
@@ -85,12 +80,10 @@ function Community() {
                 </div>
             </div>
             <div className="profile-posts centerPos">
-                <div className="feed">
-                {items.map(item => PostFeed(item, likeContent))}
-                </div>
+                <Feed location={loca}/>
                 <div className="create">
     <div className="createpost">
-      <img class="mob-navimg moba" src="/img/logo.svg"/>
+      <img className="mob-navimg moba" src="/img/logo.svg"/>
       <a href="/upload" class="abutton">Create a Post</a>
       <a href="/createcommunity" class="abutton">Create a Community</a>
       </div>

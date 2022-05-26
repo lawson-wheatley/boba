@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from './logo.svg';
 import { useFetchWrapper } from "./_helpers";
 import { useParams } from "react-router-dom";
+import { Feed } from "./Feed";
 import PostFeed from "./Post-feed";
 
 function Profile() {
@@ -15,6 +16,7 @@ function Profile() {
   const [upload, setUpload] = useState(false);
   const [filename, setFilename] = useState ("");
   const [vala, setVal] = useState(false);
+  var loca = ""
   let profile = "";
 
   function getBase64(gfile) {
@@ -41,7 +43,7 @@ function Profile() {
   }
 console.log(process.env.REACT_APP_API_URL+"/modifyppic");
   useEffect(() => { if(upload){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modifyppic", {"file":file,"filename": filename})} }, [file, filename, upload]);
-  useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-profile/"+iid).then(result =>{setUserdata(result);}) }, [iid]);
+
 
 
   if(!iid){
@@ -51,15 +53,10 @@ console.log(process.env.REACT_APP_API_URL+"/modifyppic");
         console.log(result.username);
     })
   }
-
-  if(iid && userData && !loaded){
-        fetchWrapper.get(process.env.REACT_APP_API_URL+"/profile/"+iid+"/feed").then(result => {
-          delete result.access_token;
-          finishedLoading(true);
-          setItems(result);
-        });
-
-  } else{
+  useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-profile/"+iid).then(result =>{
+    loca = "/profile/"+result.username; setUserdata(result);}) }, [iid]);
+  if(iid && userData){
+    console.log(userData);
     if (!id && !vala){
       setVal(
         <form className="ch" onSubmit={uploa}>
@@ -69,9 +66,6 @@ console.log(process.env.REACT_APP_API_URL+"/modifyppic");
         </form>
       );
     }
-
-    console.log("Userdata");
-    console.log(userData);
     return (
         <div className="center">
             <div className="pad">
@@ -92,9 +86,7 @@ console.log(process.env.REACT_APP_API_URL+"/modifyppic");
                 </div>
             </div>
             <div className="profile-posts centerPos">
-                <div className="feed">
-                {items.map(item => PostFeed(item, likeContent))}
-                </div>
+              <Feed location={loca}/>
             </div>
         </div>
         </div>
