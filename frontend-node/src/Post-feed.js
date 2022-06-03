@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Home from "./Home";
 import logo from './logo.svg';
+import Post from "./Post";
 import { useFetchWrapper } from "./_helpers";
 function PostFeed(item, likeContent, commentContent) {
   var comment = "";
@@ -30,7 +31,6 @@ function PostFeed(item, likeContent, commentContent) {
       return true;
     }
   }
-
   function setLike(v){
     likeContent(v);
     var inter = "";
@@ -81,26 +81,20 @@ function PostFeed(item, likeContent, commentContent) {
   }
     var render = (
       <div className="post" key={"post"+item.id}>
-        <div className="post-top"><div><a href={"/profile/"+item.poster}><img className = "post-profile-pic" src={process.env.REACT_APP_API_URL+item.postppic}></img></a></div><div>{item.poster} in <a href={"/bubble/"+item.community}>{item.community}</a> {item.timestamp}</div></div>
+        <div className="post-top"><div><a href={"/profile/"+item.poster}><img className = "post-profile-pic" src={process.env.REACT_APP_API_URL+item.postppic}></img></a></div><div>{item.poster} in <a className="post-community" href={"/bubble/"+item.community}>{item.community}</a></div></div>
         <div className="ptitleWrapper"><a className="post-title" href ={"/post/"+item.id}>{item.title}</a></div>
         {pinfo}
-        <div className="bottom">
-        <p>{item.content}</p>
+        <div className="bottom" style={{borderBottom: "none"}}>
+
         <button className="cbut" onClick={e => setLike(item.id)}>{isLikedContent}</button>
           <a className="" href ={"/post/"+item.id}><img className="cbut likeContent" src="/img/comment.svg" /></a>
 
             <div className ="likes" id = {item.id + "lt"}>
               {item.likes} {likeText}
             </div>
-
-            <div className ="comments">
-            </div>
+            <p>{item.content}</p>
+            <div className="timestamp">{item.timestamp}</div>
         </div>
-        <div className= "makeComment">
-              <span className="mccomment textarea" role="textbox" id ={item.id + "cm"} onInput={e => setComment(e.target.textContent)} contentEditable></span>
-              <div id={item.id + "cmcounter"}></div>
-              <div id={item.id + "subm"}></div>
-            </div>
       </div>
     );
     return render;

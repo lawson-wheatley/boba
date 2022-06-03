@@ -16,6 +16,7 @@ import Profile from './Profile'
 import PrivateRoute from "./PrivateRoute";
 import CreateCommunity from "./CreateCommunity";
 import Bubbles from "./Bubbles";
+import Register from "./Register";
 function App() {
   return (
   <RecoilRoot>
@@ -28,6 +29,7 @@ function App() {
     <Route path="/profile/:id" element={<Profile />} />
     <Route path="/profile/:id:/followers" element={ <Followers /> }/>
     <Route path="/profile/:id:/following" element={ <Following /> }/>
+    <Route path="/register" element={<Register />} />
     <Route path="/createcommunity" element={<PrivateRoute/> }>
       <Route path="/createcommunity" element={<CreateCommunity />} />
     </Route>

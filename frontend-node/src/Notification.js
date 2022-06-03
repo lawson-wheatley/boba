@@ -6,13 +6,12 @@ import { useFetchWrapper } from "./_helpers";
 function Notification(item) {
 
     return (
-      <div className="notification">
-        <div className="notiftype">
-        </div>
+      <a className="notification" href={"/post/"+item.on}>
+        <img className="post-profile-pic" src={process.env.REACT_APP_API_URL + "/" + item.pic}></img>
         <div className="notiftext">
-          
+          {item.notifier} {item.text}
         </div>
-      </div>
+      </a>
     );
   }
   

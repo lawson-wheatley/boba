@@ -4,6 +4,8 @@ import { useFetchWrapper } from "./_helpers";
 import { useParams } from "react-router-dom";
 import { Feed } from "./Feed";
 import PostFeed from "./Post-feed";
+import { setLocale } from "yup";
+import { render } from "react-dom";
 
 function Profile() {
   const fetchWrapper = useFetchWrapper();
@@ -16,7 +18,8 @@ function Profile() {
   const [upload, setUpload] = useState(false);
   const [filename, setFilename] = useState ("");
   const [vala, setVal] = useState(false);
-  var loca = ""
+  const [loca, setLoca] = useState("");
+  const [xa, setXA] = useState("");
   let profile = "";
 
   function getBase64(gfile) {
@@ -31,21 +34,21 @@ function Profile() {
       console.log('Error: ', error);
     };
  }
- function likeContent(id){
-  fetchWrapper.post(process.env.REACT_APP_API_URL+"/like", {"id":id})
-}
+  function likeContent(id){
+    fetchWrapper.post(process.env.REACT_APP_API_URL+"/like", {"id":id})
+  }
   function changeFileEvent(e){
     getBase64(e.target.files[0]);
   }
-
   function uploa() {
     setUpload(true);
   }
-console.log(process.env.REACT_APP_API_URL+"/modifyppic");
-  useEffect(() => { if(upload){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modifyppic", {"file":file,"filename": filename})} }, [file, filename, upload]);
-
-
-
+  console.log(process.env.REACT_APP_API_URL+"/modifyppic");
+  useEffect(() => { 
+    if(upload){
+      fetchWrapper.post(process.env.REACT_APP_API_URL+"/modifyppic",{"file":file,"filename": filename})
+    }
+  }, [file, filename, upload]);
   if(!iid){
       fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-username")
       .then(result =>
@@ -53,8 +56,10 @@ console.log(process.env.REACT_APP_API_URL+"/modifyppic");
         console.log(result.username);
     })
   }
-  useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-profile/"+iid).then(result =>{
-    loca = "/profile/"+result.username; setUserdata(result);}) }, [iid]);
+  useEffect(() => { if(iid){fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-profile/"+iid).then(result =>{
+    setLoca("/profile/"+result.username); setUserdata(result);})}}, [iid]);
+  useEffect(() => {if(loca!= ""){setXA(<Feed location={loca}/>)}}, [loca]);
+  useEffect(() => {}, [xa]);
   if(iid && userData){
     console.log(userData);
     if (!id && !vala){
@@ -66,15 +71,16 @@ console.log(process.env.REACT_APP_API_URL+"/modifyppic");
         </form>
       );
     }
+    console.log(loca);
     return (
-        <div className="center">
-            <div className="pad">
-            <div className="profile">
-                <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL + userData.picture}></img></div>
-                <div className = "pInfo">
-                <div className = "profile-username">{userData.username}</div>
+      <div className="center">
+        <div className="pad">
+          <div className="profile">
+            <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL + userData.picture}></img></div>
+            <div className = "pInfo">
+              <div className = "profile-username">{userData.username}</div>
                 {vala}
-                <form className="lf" ></form>
+              <form className="lf" ></form>
                 <div id = "profile-displayname"></div>
                 {userData.displayName}
                 <div id = "profile-bio"></div>
@@ -83,10 +89,10 @@ console.log(process.env.REACT_APP_API_URL+"/modifyppic");
                 <a href = {"/profile/" + userData.username + "/followers"}></a>
                 <div id = "profile-following"></div>
                 <a href = {"/"+ userData.username + "/following"}></a>
-                </div>
+              </div>
             </div>
             <div className="profile-posts centerPos">
-              <Feed location={loca}/>
+              {xa}
             </div>
         </div>
         </div>

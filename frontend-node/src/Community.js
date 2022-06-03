@@ -45,6 +45,24 @@ function Community() {
     setChangecolor(true);
   }
 
+  function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+  function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  }
+  function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+      parseInt(result[1], 16),
+      parseInt(result[2], 16),
+      parseInt(result[3], 16)
+     ] : [0,0,0];
+  }
+  
+  
+
   useEffect(() => { if(upload){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modify-community-pic", {"community":id, "file":file,"filename": filename})} }, [file, filename, upload]);
   useEffect(() => { if(changeColor){fetchWrapper.post(process.env.REACT_APP_API_URL+"/modify-community-color", {"community":id, "color":color}).then(result=>console.log(result))} }, [color, changeColor]);
   useEffect(() => { fetchWrapper.get(process.env.REACT_APP_API_URL+"/get-community/"+iid).then(result =>{setCommunityData(result);}) }, [iid]);
@@ -68,14 +86,20 @@ function Community() {
       );
       console.log("HUH");
     }else{}
-    var loca = "/community/"+id
+    var loca = "/community/"+id;
+    console.log(communityData.color);
+    console.log(hexToRgb("#"+communityData.color));
+    var vx = hexToRgb("#"+communityData.color);
+    var ya = 0.2126*vx[0] + 0.7152*vx[1] + 0.0722*vx[2];
+    var caola = ya < 128 ? "#ffffff" : "#000000";
+    console.log(caola);
     return (
         <div className="center">
             <div className="pad">
             <div className="profile" style={{backgroundColor:"#"+communityData.color}}>
                 <div className = "profile-pic-div"><img className = "profile-pic" src ={process.env.REACT_APP_API_URL + communityData.picture}></img></div>
                 <div className = "pInfo">
-                <div className = "profile-username">{communityData.name}</div>
+                <div className = "profile-username" style={{color:caola}}>{communityData.name}</div>
                 {vala}
                 </div>
             </div>

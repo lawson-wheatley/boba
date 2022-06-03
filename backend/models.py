@@ -62,7 +62,18 @@ user_following_community = db.Table(
     db.Column('user_id', db.Integer, db.ForeignKey(User.id), primary_key=True),
     db.Column('community_id', db.Integer, db.ForeignKey(Community.id), primary_key=True)
 )
-    
+
+class Notification(db.Model):
+    __tablename__ = "notification"
+    id = db.Column(db.Integer, primary_key = True)
+    post = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    action = db.Column(db.String(7), nullable= False)
+    like = db.Column(db.Integer, db.ForeignKey("like.id"))
+    comment = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    notifies = db.Column(db.Integer, db.ForeignKey("users.id"))
+    notifier = db.Column(db.Integer, db.ForeignKey("users.id"))
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+
 class Post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key = True)
@@ -73,32 +84,9 @@ class Post(db.Model):
     flocation = db.Column(db.String(120), nullable = True)
     content = db.Column(db.String(500), nullable = True)
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    comments = db.relationship('Comments', back_populates="post", uselist=False)
-    likes = db.relationship('Likes', back_populates="post", lazy = True)
-    
-class Comments(db.Model):
-    __tablename__ = "comments"
-    id = db.Column(db.Integer, primary_key = True)
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    post = db.relationship("Post", back_populates="comments")
-    coms = db.relationship("Comment", back_populates="comments")
-
-class Comment(db.Model):
-    __tablename__ = "comment"
-    id = db.Column(db.Integer, primary_key = True)
-    comments_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
-    comments = db.relationship("Comments", back_populates="coms")
-    text = db.Column(db.String(140), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    
-class Likes(db.Model):
-    __tablename__ = "likes"
-    id = db.Column(db.Integer, primary_key = True)
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    number = db.Column(db.Integer)
-    post = db.relationship("Post", back_populates="likes")
-    likm = db.relationship("Like")
+    likes = db.relationship('Like', lazy = True)
+    commes = db.relationship('Post', order_by='Post.timestamp.desc()')
+    parent = db.Column(db.Integer, db.ForeignKey("posts.id"))
 
 class Like(db.Model):
     __tablename__ = "like"
@@ -106,5 +94,5 @@ class Like(db.Model):
     text = db.Column(db.String(140), nullable=False)
     owner = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    likes_id = db.Column(db.Integer, db.ForeignKey('likes.id'))
+    post = db.Column(db.Integer, db.ForeignKey('posts.id'))
     

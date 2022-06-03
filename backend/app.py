@@ -16,14 +16,15 @@ import hashlib, os, uuid, json
 api = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 api.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'tmpdb.db')
-api.config["JWT_SECRET_KEY"] = "12345678"
-api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
+api.config["JWT_SECRET_KEY"] = "adfs0a9sdf9aklm"
+api.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=6)
 db.init_app(api)
+
 migrate = Migrate(api, db)
 CORS(api)
 with api.app_context():
     db.create_all()
-from models import User, Comments, Comment, Likes, Like, Post, user_following, Community, user_moderating, user_following_community
+from models import User, Like, Post, user_following, Community, user_moderating, user_following_community, Notification
 
 jwt = JWTManager(api)
 
@@ -32,6 +33,40 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'webp'])
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@api.route("/notifications")
+@jwt_required()
+def notifications():
+    user = get_jwt_identity()
+    page = request.args.get("page", None)
+    notifications = Notification.query.filter(Notification.notifies == user).order_by(Notification.timestamp.desc())
+    return jsonify([notification_to_json(notification) for notification in notifications]), 200
+
+def notification_to_json(notification):
+    user = User.query.filter(User.id == notification.notifier).first()
+    post = Post.query.filter(Post.id == notification.post).first()
+    if post.parent:
+        type = "post"
+    elif post.parent == -1:
+        type= "story"
+    else:
+        type="comment"
+    action = notification.action
+    if action == "comment":
+        comm = Post.query.filter(Post.id == notification.comment).first()
+        if(comm != None):
+            text = f" replied {comm.content}"
+        else:
+            text = f" replied..."
+    else:
+        text = f" liked your {type}"
+    post = notification.post
+    dic = {"notifier":user.username, 
+           "pic":user.picture,
+           "text": text,
+           "on":notification.post}
+    return dic
+
+    
 @api.route("/storage/<id>")
 def retFile(id):
     return send_from_directory('storage', id)
@@ -44,6 +79,7 @@ def upload():
     title = request.json.get("title", None)
     file = request.json.get("file", None)
     fileName = request.json.get("filename", None)
+    print(request.json)
     post = Post()
     post.poster = user
     post.posttitle = title
@@ -52,15 +88,7 @@ def upload():
         post.community = community
     if fileName == "":
         post.isText = True
-        comments = Comments()
-        comments.post_id = post.id
-        comments.post = post
-        likes = Likes()
-        likes.post_id = post.id
-        likes.post = post
         db.session.add(post)
-        db.session.add(comments)
-        db.session.add(likes)
         db.session.commit()
         return jsonify({"message" : "Posted!"}), 200
     
@@ -77,33 +105,63 @@ def upload():
         image.save(post_location, "webp")
         post.flocation = f"/storage/{full_final_name}.webp"
     post.isText = False
-    comments = Comments()
-    comments.post_id = post.id
-    comments.post = post
-    likes = Likes()
-    likes.post_id = post.id
-    likes.post = post
     db.session.add(post)
-    db.session.add(comments)
-    db.session.add(likes)
     db.session.commit()
-
+    print(post.id)
     return jsonify({"message": "Completed"}), 200
+
+def story_to_json(post):
+    foutput = tstamp_to_tsince(post.timestamp)
+    likes = Likes.query.filter(Likes.post_id == post.id).first()
+    likeButton = False
+    isLiked = False
+    if usr:
+        if likes.number != 0:
+            isLiked = Like.query.filter(Like.likes_id == likes.id).filter(Like.owner == usr).first()
+        if isLiked:
+            likeButton = True
+    poster = User.query.filter(User.id==post.poster).first()
+    dic = {"flocation":post.flocation,
+           "content":post.content,
+           "isliked": likeButton,
+           "likes": likes.number,
+           "id":post.id,
+           "isText":post.isText,
+           "poster": poster.username,
+           "postppic": poster.picture,
+           "title":post.posttitle,
+           "timestamp":foutput}
+    
+    return dic
 
 @api.route("/comment", methods=["POST"])
 @jwt_required()
 def comment():
     user = get_jwt_identity()
+    print(request.json)
     comment = request.json.get("comment", None)
     post = request.json.get("post", None)
-    comments = Comments.query.filter(Comments.post_id == post).first()
-    com = Comment()
-    com.owner_id = user
-    com.text = comment
-    com.comments_id = comments.id
-    com.comments = comments
-    comments.coms.insert(com)
+    ch = Post.query.filter(Post.id == post).first()
+    print("HUH")
+    if not ch:
+        return jsonify({"message":"Post does not exist"}), 400
+    com = Post()
+    com.posttitle="7Zxgsf"
+    com.isText = True
+    com.content = comment
+    com.poster = user
+    com.parent = post
+    db.session.add(com)
     db.session.commit()
+    notif = Notification()
+    notif.action="comment"
+    notif.comment = com.id
+    notif.notifier = user
+    notif.notifies = Post.query.filter(Post.id == post).first().poster
+    notif.post = post
+    db.session.add(notif)
+    db.session.commit()
+    return jsonify({"message":"Comment successful!",}), 200
 
 @api.route("/create-community", methods=["POST"])
 @jwt_required()
@@ -116,6 +174,7 @@ def create_community():
     community = Community()
 
     community.name = community_name
+    community.picture = "/storage/boba.png"
     user = User.query.filter(User.id == user).first()
     user.moderating.insert(user.id, community)
     db.session.add(community)
@@ -210,47 +269,31 @@ def getUsername():
     usr = User.query.filter(User.id == current_user).first()
     return jsonify(username=usr.username), 200
 
+@api.route("/stories", methods=["GET"])
+@jwt_required()
+def getStories():
+    posts = Post.query.filter(Post.parent == -1).order_by(Post.timestamp.desc())
+    return jsonify()
+    pass
+
 @api.route("/feed", methods = ["GET"])
 @jwt_required(optional=True)
 def feed():
     current_user = get_jwt_identity()
     page = int(request.args.get("page"))+1
     print(page)
-    posts = Post.query.order_by(Post.timestamp.desc()).paginate(page=page, max_per_page=15)
-    print(posts.has_next)
+    posts = Post.query.filter(Post.parent == None).order_by(Post.timestamp.desc()).paginate(page=page, max_per_page=15)
     return jsonify({"has_next":posts.has_next, "posts":[convert_post_to_json(posts.items[i], current_user) for i in range(len(posts.items))]}), 200
 
 def convert_post_to_json(post, usr):
     print(post.id)
-    time = datetime.utcnow()
-    tdelta = time-post.timestamp
-    days, seconds = tdelta.days, tdelta.seconds
-    foutput = ""
-    if days == 0:
-        hours = days * 24 + seconds // 3600
-        if hours == 0:
-            minutes = (seconds % 3600) // 60
-            if minutes == 0:
-                seconds = seconds % 60
-                foutput = f"{seconds} seconds ago"
-            elif minutes == 1:
-                foutput = f"{minutes} minute ago"
-            else:
-                foutput = f"{minutes} minutes ago"
-        elif hours == 1:
-            foutput = f"{hours} hour ago"
-        else:
-            foutput = f"{hours} hours ago"
-    elif days == 1:
-        foutput = f"{days} day ago"
-    else:
-        foutput = f"{days} days ago"
-    likes = Likes.query.filter(Likes.post_id == post.id).first()
+    print(post.parent)
+    foutput = tstamp_to_tsince(post.timestamp)
     likeButton = False
     isLiked = False
     if usr:
-        if likes.number != 0:
-            isLiked = Like.query.filter(Like.likes_id == likes.id).filter(Like.owner == usr).first()
+        if len(post.likes) != 0:
+            isLiked = Like.query.filter(Like.post == post.id).filter(Like.owner == usr).first()
         if isLiked:
             likeButton = True
     poster = User.query.filter(User.id==post.poster).first()
@@ -258,15 +301,15 @@ def convert_post_to_json(post, usr):
            "community":post.community,
            "content":post.content,
            "isliked": likeButton,
-           "likes": likes.number,
+           "likes": len(post.likes) if len(post.likes) else 0,
            "id":post.id,
            "isText":post.isText,
            "poster": poster.username,
            "postppic": poster.picture,
            "title":post.posttitle,
            "timestamp":foutput}
-    
     return dic
+
 @api.route("/follow", methods=["POST"])
 @jwt_required()
 def follow():
@@ -306,19 +349,6 @@ def logout():
     unset_jwt_cookies(response)
     return response
 
-@api.route("/post/<idd>/comments", methods=["GET"])
-@jwt_required(optional=True)
-def postComments(idd):
-    start = request.json.get("page", None)
-    post = request.json.get("post", None)
-    ret = Comment.query.filter(Comment.comments == Comments.query.filter(Comments.post_id == idd).first())
-    if ret:
-        ret.paginate(start,5,False)
-        record_items = ret.items
-        return jsonify({"comments":record_items}), 200
-    else:
-        return jsonify({"message":"Not found"}), 404
-
 @api.route("/get-profile/<id>", methods=["GET"])
 @jwt_required(optional=True)
 def getProfile(id):
@@ -330,25 +360,29 @@ def getProfile(id):
 def like():
     user = get_jwt_identity()
     post = request.json.get("id", None)
-    likes = Likes.query.filter(Likes.post_id == post).first()
-    checkIfLiked = Like.query.filter(Like.likes_id == likes.id)
+    checkIfLiked = Like.query.filter(Like.post == post)
     chk = False
     if checkIfLiked:
         chk = checkIfLiked.filter(Like.owner == user).first()
     if chk:
+        print(chk)
+        notif = Notification.query.filter(Notification.post == post).filter(Notification.action=="like").filter(Notification.notifier == user).first()
+        print(notif)
+        db.session.delete(notif)
         db.session.delete(chk)
-        likes.number = likes.number - 1
     else:
         like = Like()
         like.text = ""
-        like.likes_id = likes.id
+        like.post = post
         like.owner = user
-        if not likes.number:
-            likes.number = 1
-        else:
-            likes.number = likes.number + 1
         db.session.add(like)
-        likes.likm.insert(likes.id, like)
+        notif = Notification()
+        notif.action="like"
+        notif.like = like.id
+        notif.notifier = user
+        notif.notifies = Post.query.filter(Post.id == post).first().poster
+        notif.post = post
+        db.session.add(notif)
 
     db.session.commit()
     return jsonify({"message":"Liked"}), 200
@@ -396,9 +430,9 @@ def modifyppic():
 @jwt_required(optional=True)
 def getFeed(id):
     user = get_jwt_identity()
-    usr = User.query.filter(User.username == id).first()
     page = int(request.args.get("page")) + 1
-    posts = Post.query.filter(Post.poster == usr.id).order_by(Post.timestamp.desc()).paginate(page=page, max_per_page=15)
+    pcx = User.query.filter(User.username == id).first().id
+    posts = Post.query.filter(Post.poster == pcx).filter(Post.parent == None).order_by(Post.timestamp.desc()).paginate(page=page, max_per_page=15)
     return jsonify({"has_next":posts.has_next, "posts":[convert_post_to_json(posts.items[i], user) for i in range(len(posts.items))]}), 200
 
 def getProfileInfo(profile):
@@ -408,10 +442,78 @@ def getProfileInfo(profile):
 @api.route("/post/<idd>", methods=["GET"])
 @jwt_required(optional=True)
 def get_post(idd):
-    ret = Post.query.filter(Post.id == idd).first();
+    ret = Post.query.filter(Post.id == idd).first()
     if ret:
         return jsonify(convert_post_to_json(ret, get_jwt_identity())), 200
     return jsonify({"message":"Not found"}), 404
+
+@api.route("/post/<id>/comments", methods=["GET"])
+@jwt_required(optional=True)
+def getComments(id):
+    print("HUH")
+    ret = Post.query.filter(Post.id == id).first().commes
+    current_user = get_jwt_identity()
+    rev = [comment_to_json(comment, current_user, 3) for comment in ret]
+    return jsonify(rev), 200
+
+def comment_to_json(comment, usr, depth=3):
+    """
+    Display commment + subcomments in json
+    {
+        "comment":comment.id
+        "author":comment.author
+        "likes":comment.likes
+        "isLiked":
+        "isText":comment.isText
+        [{sub_comment.id]
+    }
+    """
+    foutput = tstamp_to_tsince(comment.timestamp)
+    comms = []
+    if comment.commes and depth != 0:
+        for val in comment.commes:
+            comms.append(comment_to_json(val, usr, depth - 1))
+    isLiked = False
+    author = User.query.filter(User.id == comment.poster).first()
+    if(usr):
+        isLiked = True if Like.query.filter(Like.post == comment.id).filter(Like.owner == usr).first() else False
+    comm = {"id":comment.id,
+            "tsince":foutput,
+            "authorpic": author.picture,
+            "author":author.displayName, 
+            "content":comment.content,
+            "likes":0 if not len(comment.likes) else len(comment.likes), 
+            "isLiked": isLiked,
+            "isText": True, 
+            "replies":comms}
+    return comm
+
+def tstamp_to_tsince(tstamp):
+    foutput = ""
+    time = datetime.utcnow()
+    tdelta = time-tstamp
+    days, seconds = tdelta.days, tdelta.seconds
+    if days == 0:
+        hours = days * 24 + seconds // 3600
+        if hours == 0:
+            minutes = (seconds % 3600) // 60
+            if minutes == 0:
+                seconds = seconds % 60
+                foutput = f"{seconds} seconds ago"
+            elif minutes == 1:
+                foutput = f"{minutes} minute ago"
+            else:
+                foutput = f"{minutes} minutes ago"
+        elif hours == 1:
+            foutput = f"{hours} hour ago"
+        else:
+            foutput = f"{hours} hours ago"
+    elif days == 1:
+        foutput = f"{days} day ago"
+    else:
+        foutput = f"{days} days ago"
+    return foutput
+
 
 @api.route("/register", methods=["POST","GET"])
 def register():
@@ -429,6 +531,7 @@ def register():
     user = User()
     user.displayName = displayName
     user.username = username
+    user.picture = "/storage/boba.png"
     user.email = email
     passthesalt = hashPass(password=password)
     user.password = passthesalt[1]

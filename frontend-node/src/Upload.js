@@ -14,7 +14,7 @@ function Upload(item) {
   const [text, setText] = useState("");
   const [filename, setFilename] = useState ("");
   const [items, setItems] = useState([]);
-  const [upload, setUpload] = useState(true);
+  const [upload, setUpload] = useState(false);
   function getBase64(file) {
     var reader = new FileReader();
     reader.readAsDataURL(file);
@@ -34,10 +34,10 @@ function Upload(item) {
     getBase64(e.target.files[0]);
   }
   function uploa() {
-    return fetchWrapper.post(process.env.REACT_APP_API_URL+"/upload", {"file":file,"filename": filename, "title":title,"community":community, "text":text});
+    return fetchWrapper.post(process.env.REACT_APP_API_URL+"/upload", {"file":file,"filename": filename, "title":title,"community":community, "text":text}).then(result=> {console.log(result);});
   }
 
-  useEffect(()=>{uploa()}, [upload])
+  useEffect(()=>{if(upload){uploa()}}, [upload])
   function seCommunity(e){
     setCommunity(e);
     if(e.length == 0){
@@ -60,16 +60,16 @@ function Upload(item) {
           <div className = "login-containerh">
     <div className="container-bubble">
           <div className="loginform lf">
-              <form className="lf" onSubmit={uploa}>
+              <form className="lf">
                   <input className="in cl si" type="text" name="title" placeholder="Title" onChange={e => setTitle(e.target.value)}></input>
 
                   <input className="in cl si" autocomplete="off" id="community" type="text" name="community" placeholder="Community" onChange={e => seCommunity(e.target.value)}></input>
                   <div className="searchAutocomplete">
-                  <div id = "searchAutocomplete" style={{display: "none"}}className="searchAutocomplete-content in cl si">{items.map(item => {return (<input type="button" onClick={e => settCommunity(item)} value={item}></input>)})}</div>
+                  <div id = "searchAutocomplete" style={{display: "none"}}className="searchAutocomplete-content cl si">{items.map(item => {return (<input className="autoButton" type="button" onClick={e => settCommunity(item)} value={item}></input>)})}</div>
                   </div>
                   <textarea className="in cl si" rows="4" cols="25" name="posttext" placeholder="Post text" onChange={e => setText(e.target.value)}></textarea>
                   <input className="bt in" type="file" name="file" onChange={e => changeFileEvent(e)}/>
-                  <input className="bt in" type="submit"></input>
+                  <input className="bt in" type="button" value="Submit" onClick={e=> setUpload(true)}></input>
               </form>
           </div>
       </div>

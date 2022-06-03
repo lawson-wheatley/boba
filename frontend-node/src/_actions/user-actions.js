@@ -21,14 +21,8 @@ function useUserActions () {
         return fetchWrapper.post(process.env.REACT_APP_API_URL+"/login", { username, password })
             .then(result => {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
-                console.log(result);
                 localStorage.setItem('user', JSON.stringify(result));
-                console.log(result);
                 setAuth(result);
-
-                // get return url from location state or default to home page
-                const { from } = history.location.state || { from: { pathname: '/' } };
-                history.push(from);
             });
     }
 
