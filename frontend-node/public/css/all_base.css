@@ -151,6 +151,7 @@ body{margin: 0;padding: 0; background-color: #f0f0f0;font-family: 'Poppins','Hel
         margin-top: 10px;
         z-index: 20;
         padding-left: 0.5vh;
+        padding-right: 0.5vh;
         padding-bottom: 1vh;
         width: 60%;
         -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -272,6 +273,25 @@ body{margin: 0;padding: 0; background-color: #f0f0f0;font-family: 'Poppins','Hel
     }
 }
 @media only screen and (max-width:768px){
+    .Notifications{
+        margin-top: 7.6vh;
+        margin-bottom: 7.6vh;
+        height: calc(100vh - 15.2vh);
+        overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
+    }
+    .notification{
+        display: flex;
+        flex-direction:row;
+        justify-content:left;
+        padding: 10px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #9e9e9e;
+        text-decoration: none;
+    color: black;
+    }
     .postholder{
         position:fixed;
         margin-top: 7.6vh;
@@ -662,27 +682,60 @@ input[type="button"]{
     resize:none;
     overflow-y:visible;
 }
-.mcreply{
+.rep{
     border-radius: 5px;
-    background-color:#dddddd;
+    background-color:#eeeeee;
     border: none;
     outline: none;
-    width: 25px;
     resize:none;
     overflow-y:visible;
     padding: 5px;
 }
+.mcreply{
+    border-radius: 3px;
+    padding: 5px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.2s;
+}
+.cha{
+    margin-top: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+}
+.repbutton{
+    display: inline-block;
+
+    padding: 7.5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border: none;
+    background-color:#007FFF;
+    border-radius: 3px;
+    color: white;
+
+}
+.cmcount{
+    display: inline-block;
+    padding: 5px;
+
+}
+.mcreply:focus{
+    background-color:#dddddd;
+    transition: 0.2s;
+}
+.makeReply{
+    overflow-y:visible;
+    resize:vertical;
+}
+
 .makeComment{
     padding: 5px 10px 5px 10px;
     overflow-y:visible;
     resize:vertical;
 }
-.makeReply{
-    background-color: #eeeeee;
-    margin: 0px 20px 0px 0px;
-    overflow-y:visible;
-    resize:vertical;
-}
+
 .back{
     padding-bottom: 0.5vh;
     margin-bottom: 1vh;

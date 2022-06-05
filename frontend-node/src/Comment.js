@@ -64,8 +64,10 @@ function Comment(item, likeContent, commentContent) {
         <div className="rep" style={{display:"none"}} id={item.id + "cmrp"}>
           <div className= "makeReply" onBlur={e=> unDisp()}>
               <span className="mcreply textarea" role="textbox" onInput={e => setComment(e.target.textContent)} contentEditable></span>
-              <div id={item.id + "cmcounter"}></div>
-              <input type="button" id={item.id + "subm"} onClick={e => comme()} value="reply" />
+              <div className="cha">
+              <div className="cmcount" id={item.id + "cmcounter"}></div>
+              <input className="repbutton" type="button" id={item.id + "subm"} onClick={e => comme()} value="reply" />
+              </div>
             </div>
         </div>
         <div className="replies">
