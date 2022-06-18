@@ -13,7 +13,7 @@ This project is intended to be a basic photo sharing social media platform akin 
   - [Followers and Following Pages](#Followers-and-Following)
 
 ## Installation
-This document is for the instaswatch release 1.0
+This document is for the Boba release 1.0
 
 ### Requirements
 This project was written with Python 3.8, latest packages.
